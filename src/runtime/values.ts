@@ -14,3 +14,12 @@ export interface NumberValue extends RuntimeValue {
     type: "number"
     value: number
 }
+
+export class Create {
+    static number(value: number): NumberValue {
+        return { type: "number", value }
+    }
+    static null(): NullValue {
+        return { type: "null", value: "null" }
+    }
+}

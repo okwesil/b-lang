@@ -1,13 +1,12 @@
 import Parser from "./main/parser"
-import { Program } from "./main/ast"
 import { evaluate } from "./runtime/interpreter"
 import readline from "readline/promises"
 // basically just a scope
 import Environment from "./runtime/environment"
-import { NumberValue } from "./runtime/values"
+import { Create, NumberValue } from "./runtime/values"
 
 const env = new Environment(null)
-env.declareVariable("pi", { type: "number", value: Math.PI } as NumberValue)
+env.declareVariable("x", Create.number(Math.PI))
 
 async function ask(prompt: string): Promise<string> {
     const rl = readline.createInterface({
