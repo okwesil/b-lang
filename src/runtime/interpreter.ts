@@ -27,6 +27,15 @@ function evaluateProgram(program: Program, env: Environment): RuntimeValue {
     return lastEvaluated
 } 
 
+function evaluateIdentifier(astNode: Identifier, env: Environment): RuntimeValue {
+    let variable = env.lookup((astNode as Identifier).name)
+    return {
+        type: "number",
+        value: (variable as NumberValue).value
+    } as NumberValue
+
+}
+
 
 function solve(operator: Operator, left: number, right: number): number {
     switch(operator) {
@@ -61,11 +70,7 @@ export function evaluate(astNode: Statement, env: Environment): RuntimeValue {
                 value: "null"
             } as NullValue
         case "Identifier":
-            let variable = env.lookup((astNode as Identifier).name)
-            return {
-                type: "number",
-                value: (variable as NumberValue).value
-            } as NumberValue
+           return evaluateIdentifier(astNode as Identifier, env)
         case "BinaryExp":
             return evaluateBinaryExpression(astNode as BinaryExp, env)
         case "Program":

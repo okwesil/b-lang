@@ -7,7 +7,7 @@ import Environment from "./runtime/environment"
 import { NumberValue } from "./runtime/values"
 
 const env = new Environment(null)
-env.declareVariable("x", { type: "number", value: 100 } as NumberValue)
+env.declareVariable("pi", { type: "number", value: Math.PI } as NumberValue)
 
 async function ask(prompt: string): Promise<string> {
     const rl = readline.createInterface({

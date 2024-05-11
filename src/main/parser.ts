@@ -11,8 +11,6 @@ export default class Parser {
         // in future when we have statements like function declarations
         // we can use this function to parse them so for now return expression
 
-
-
         return this.parse_expression()
     }
 
