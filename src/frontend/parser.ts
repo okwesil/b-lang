@@ -1,4 +1,4 @@
-import { Program, Statement, Expression, BinaryExp, Identifier, NumberLiteral, NullLiteral } from "./ast"
+import { Program, Statement, Expression, BinaryExp, Identifier, NumberLiteral } from "./ast"
 import { tokenize, Token, TokenType } from "./lexer"
 
 export default class Parser {
@@ -119,10 +119,6 @@ export default class Parser {
                     "Invalid or unexpected token found, Expected \")\""
                 )
                 return value
-            case TokenType.Null:
-                this.eat() // advance past null keyword
-                return { type: "NullLiteral", value: "null" } as NullLiteral
-
             default:
                 process.exitCode = 101
                 console.error(`Invalid or unexpected token found while parsing: { type: ${this.get().type}, value: ${this.get().value} }`)

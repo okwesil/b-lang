@@ -1,4 +1,4 @@
-import Parser from "./main/parser"
+import Parser from "./frontend/parser"
 import { evaluate } from "./runtime/interpreter"
 import readline from "readline/promises"
 // basically just a scope
@@ -6,7 +6,10 @@ import Environment from "./runtime/environment"
 import { Create, NumberValue } from "./runtime/values"
 
 const env = new Environment(null)
-env.declareVariable("x", Create.number(Math.PI))
+env.declareVariable("true", Create.bool(true))
+env.declareVariable("false", Create.bool(false))
+env.declareVariable("null", Create.null())
+
 
 async function ask(prompt: string): Promise<string> {
     const rl = readline.createInterface({

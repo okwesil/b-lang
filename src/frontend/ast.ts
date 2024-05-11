@@ -1,4 +1,4 @@
-export type NodeType = "Program" | "NumberLiteral" | "NullLiteral" | "Identifier" | "BinaryExp";
+export type NodeType = "Program" | "NumberLiteral" | "Identifier" | "BinaryExp";
 export type Operator = "+" | "-" | "*" | "/" | "%" | "^"
 
 
@@ -30,11 +30,6 @@ export interface Identifier extends Expression {
 export interface NumberLiteral extends Expression {
     type: "NumberLiteral",
     value: number
-}
-
-export interface NullLiteral extends Expression {
-    type: "NullLiteral",
-    value: "null"
 }
 
 

@@ -13,13 +13,11 @@ export enum TokenType {
     OpenParen, CloseParen,
     OpenCurlyBrace, CloseCurlyBrace,
     BinaryOperator,
-    Null,
     EOF, // end of file token type
 }
 
 const KEYWORDS: Record<string, TokenType> = {
     "let": TokenType.VarDeclare,
-    "null": TokenType.Null
 }
 
 

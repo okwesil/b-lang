@@ -1,12 +1,12 @@
-import { RuntimeValue, NumberValue, NullValue, Create } from "./values";
-import { BinaryExp, NumberLiteral, Statement, Operator, Program, isExpression, Identifier} from "../main/ast";
+import { RuntimeValue, NumberValue, Create } from "./values";
+import { BinaryExp, NumberLiteral, Statement, Operator, Program, isExpression, Identifier} from "../frontend/ast";
 import Environment from "./environment";
 import { olog } from "../index"
 
 
 function evaluateBinaryExpression(binaryOp: BinaryExp, env: Environment): RuntimeValue {
     // if its a binary expression then recursively call
-    let left = evaluate(binaryOp.left, env)  as NumberValue 
+    let left = evaluate(binaryOp.left, env) as NumberValue 
     let right = evaluate(binaryOp.right, env) as NumberValue 
     const { operator } = binaryOp
 
@@ -56,8 +56,6 @@ export function evaluate(astNode: Statement, env: Environment): RuntimeValue {
     switch(astNode.type) {
         case "NumberLiteral":
             return Create.number((astNode as NumberLiteral).value)
-        case "NullLiteral":
-            return Create.null()
         case "Identifier":
            return evaluateIdentifier(astNode as Identifier, env)
         case "BinaryExp":

@@ -1,4 +1,4 @@
-export type ValueType = "null" | "number"
+export type ValueType = "null" | "number" | "boolean"
 
 export interface RuntimeValue {
     type: ValueType
@@ -9,10 +9,14 @@ export interface NullValue extends RuntimeValue{
     value: "null"
 }
 
-
 export interface NumberValue extends RuntimeValue {
     type: "number"
     value: number
+}
+
+export interface BooleanValue extends RuntimeValue {
+    type: "boolean",
+    value: boolean
 }
 
 export class Create {
@@ -21,5 +25,8 @@ export class Create {
     }
     static null(): NullValue {
         return { type: "null", value: "null" }
+    }
+    static bool(value: boolean): BooleanValue {
+        return { type: "boolean", value }
     }
 }
