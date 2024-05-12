@@ -86,6 +86,11 @@ export function tokenize(sourceCode: string): Token[] {
             let num = ""
             while (src.length > 0 && isint(src[0])) {
                 num += src.shift()
+                // to get decimals
+                if (src[1] == "." && isint(src[2])) {
+                    num += src.shift()
+                    num += src.shift()
+                }
             }
             tokens.push(tokenFrom(num, TokenType.Number))
             

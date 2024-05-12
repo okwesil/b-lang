@@ -35,9 +35,12 @@ export default class Parser {
 
         // if no value at declaration
         if (next.type == TokenType.Semicolon) {
+            if (declarator.type == TokenType.ConstantVar) {
+                throw new Error("Constant variable declarations must be declared with a value")
+            }
             return { 
                 type: "VariableDeclaration",
-                constant: declarator.type == TokenType.ConstantVar,
+                constant: false,
                 identifier,  
             } as VariableDeclaration
         }
@@ -46,13 +49,15 @@ export default class Parser {
             throw new Error("Must have equals sign to declare variable")
         }
 
-        return { 
+        const declaration: VariableDeclaration = { 
             type: "VariableDeclaration",
             constant: declarator.type == TokenType.ConstantVar,
             identifier,  
             value: this.parse_expression()
-        } as VariableDeclaration
-        
+        } 
+        // 
+        this.expect(TokenType.Semicolon, "Expected semicolon after variable declaration")
+        return declaration
     }
 
 
