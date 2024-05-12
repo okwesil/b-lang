@@ -1,4 +1,13 @@
-export type NodeType = "Program" | "NumberLiteral" | "Identifier" | "BinaryExp";
+import { RuntimeValue } from "../runtime/values"
+
+export type NodeType = 
+    "Program" 
+    | "NumberLiteral" 
+    | "Identifier" 
+    | "BinaryExp" 
+    | "VariableDeclaration";
+
+
 export type Operator = "+" | "-" | "*" | "/" | "%" | "^"
 
 
@@ -6,9 +15,15 @@ export type Operator = "+" | "-" | "*" | "/" | "%" | "^"
 export interface Statement {
     type: NodeType
 }
-export interface AssignmentStmt extends Statement {
-    variable: Identifier,
-    valueToAssign: number
+
+
+// "value" property can be undefined like if we do:
+// Let x;
+export interface VariableDeclaration extends Statement {
+    type: "VariableDeclaration"
+    constant: boolean
+    identifier: string
+    value?: Expression
 }
 
 
@@ -21,6 +36,7 @@ export interface BinaryExp extends Expression {
     right: Expression,
     operator: Operator
 }
+
 
 export interface Identifier extends Expression {
     type: "Identifier",

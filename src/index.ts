@@ -40,7 +40,7 @@ async function repl(): Promise<void> {
         }
 
         const program = parser.makeAST(input)
-        olog(evaluate(program, env))
+        console.log((evaluate(program, env) as NumberValue).value)
         console.log("-------------\n")
     }
 }

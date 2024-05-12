@@ -1,4 +1,5 @@
-import { Program, Statement, Expression, BinaryExp, Identifier, NumberLiteral } from "./ast"
+import { Create } from "../runtime/values"
+import { Program, Statement, Expression, BinaryExp, Identifier, NumberLiteral, VariableDeclaration } from "./ast"
 import { tokenize, Token, TokenType } from "./lexer"
 
 export default class Parser {
@@ -10,9 +11,50 @@ export default class Parser {
     private parse_statment(): Statement {
         // in future when we have statements like function declarations
         // we can use this function to parse them so for now return expression
+        switch(this.get().type) {
+            case TokenType.MutableVar:
+            case TokenType.ConstantVar:
+                return this.parse_variable_declaration()
+            default:
+                return this.parse_expression()
+        }
 
-        return this.parse_expression()
     }
+
+    /*
+        format:
+        ( const | let ) identifier = expression
+        or
+        ( const | let ) identifier;
+
+    */
+    private parse_variable_declaration(): Statement {
+        const declarator = this.eat()
+        const identifier = this.expect(TokenType.Identifier, "Unexpected token, expected: identifier").value
+        let next = this.eat()
+
+        // if no value at declaration
+        if (next.type == TokenType.Semicolon) {
+            return { 
+                type: "VariableDeclaration",
+                constant: declarator.type == TokenType.ConstantVar,
+                identifier,  
+            } as VariableDeclaration
+        }
+
+        if (next.type != TokenType.Equals) {
+            throw new Error("Must have equals sign to declare variable")
+        }
+
+        return { 
+            type: "VariableDeclaration",
+            constant: declarator.type == TokenType.ConstantVar,
+            identifier,  
+            value: this.parse_expression()
+        } as VariableDeclaration
+        
+    }
+
 
     /*
     
@@ -127,15 +169,29 @@ export default class Parser {
         }
     }
 
+    /**
+    * Returns the next token in the token stream without removing it.
+    * @returns {Token} The next token in the token stream.
+    */
     private get(): Token {
         return this.tokens[0]
-    } 
+    }
+    /**
+     * Consumes the next token from the token stream and returns it.
+     * @returns {Token} The next token in the stream.
+     */
     private eat(): Token {
         const prev = this.tokens.shift()
         return prev as Token
     }
-    private expect(desiredType: TokenType, err: string): Token | undefined {
-        const previous = this.tokens.shift()
+    /**
+     * Expects a token of the specified type and returns it. If the token does not match the expected type, logs an error and exits the process.
+     * @param desiredType - The expected token type.
+     * @param err - The error message to log if the token does not match the expected type.
+     * @returns The previous token if it matches the expected type
+     */
+    private expect(desiredType: TokenType, err: string): Token  {
+        const previous = this.eat()
         if (!previous || previous.type != desiredType) {
             console.error(err)
             process.exit()

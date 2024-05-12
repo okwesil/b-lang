@@ -8,16 +8,21 @@ export enum TokenType {
     Number,
     String,
     Identifier,
+    
     Equals,
-    VarDeclare,
+    MutableVar,
+    ConstantVar,
+
     OpenParen, CloseParen,
     OpenCurlyBrace, CloseCurlyBrace,
     BinaryOperator,
+    Semicolon,
     EOF, // end of file token type
 }
 
 const KEYWORDS: Record<string, TokenType> = {
-    "let": TokenType.VarDeclare,
+    "let": TokenType.MutableVar,
+    "const": TokenType.ConstantVar
 }
 
 
@@ -69,6 +74,9 @@ export function tokenize(sourceCode: string): Token[] {
                 continue
             case "}":
                 tokens.push(tokenFrom(src.shift(), TokenType.CloseCurlyBrace))
+                continue
+            case ";":
+                tokens.push(tokenFrom(src.shift(), TokenType.Semicolon))
                 continue
         }
         //handle multi-character tokens

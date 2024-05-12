@@ -1,5 +1,5 @@
-import { RuntimeValue, NumberValue, Create } from "./values";
-import { BinaryExp, NumberLiteral, Statement, Operator, Program, isExpression, Identifier} from "../frontend/ast";
+import { RuntimeValue, NumberValue, Create, NullValue } from "./values";
+import { BinaryExp, NumberLiteral, Statement, Operator, Program, isExpression, Identifier, VariableDeclaration, Expression} from "../frontend/ast";
 import Environment from "./environment";
 import { olog } from "../index"
 
@@ -51,6 +51,11 @@ function solve(operator: Operator, left: number, right: number): number {
     }
 }
 
+function evaluateVariableDeclaration(declaration: VariableDeclaration, env: Environment): NullValue {
+    env.declareVariable(declaration.identifier, declaration.value ? evaluate(declaration.value as Expression, env): Create.null())
+    return Create.null()
+}
+
 
 export function evaluate(astNode: Statement, env: Environment): RuntimeValue {
     switch(astNode.type) {
@@ -60,6 +65,8 @@ export function evaluate(astNode: Statement, env: Environment): RuntimeValue {
            return evaluateIdentifier(astNode as Identifier, env)
         case "BinaryExp":
             return evaluateBinaryExpression(astNode as BinaryExp, env)
+        case "VariableDeclaration":
+            return evaluateVariableDeclaration(astNode as VariableDeclaration, env)
         case "Program":
             return evaluateProgram(astNode as Program, env)
         default:
