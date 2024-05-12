@@ -1,4 +1,4 @@
-import { Program, Statement, Expression, BinaryExp, Identifier, NumberLiteral, VariableDeclaration } from "./ast"
+import { Program, Statement, Expression, BinaryExp, Identifier, NumberLiteral, VariableDeclaration, AssignmentExp } from "./ast"
 import { tokenize, Token, TokenType } from "./lexer"
 
 export default class Parser {
@@ -78,8 +78,22 @@ export default class Parser {
 
 
     private parse_expression(): Expression {
-        return this.parse_additive_expression()
+        return this.parse_assignment_expression()
     }
+
+
+    private parse_assignment_expression(): Expression {
+        const left = this.parse_additive_expression() // in future switch out with objectExpr
+        
+        if (this.get().type == TokenType.Equals) {
+            this.eat() // go past equal sign
+            const value = this.parse_assignment_expression()
+            return { value, assignee: left, type: "AssignmentExp" } as AssignmentExp
+        }
+
+        return left
+    }
+
 
     // 10 + 5 - 5, treated as 
     // (10 + 5) - 5

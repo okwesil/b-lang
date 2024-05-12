@@ -6,7 +6,7 @@ export type NodeType =
     | "Identifier" 
     | "BinaryExp" 
     | "VariableDeclaration"
-    | "VariableAssignment";
+    | "AssignmentExp";
 
 
 export type Operator = "+" | "-" | "*" | "/" | "%" | "^"
@@ -27,9 +27,19 @@ export interface VariableDeclaration extends Statement {
     value?: Expression
 }
 
-export interface VariableAssignment extends Statement {
-    type: "VariableAssignment"
-    identifier: string
+/*
+    normal format:
+        x = {} 
+    assignee is expression because:
+        x.foo = {}
+        ^^^
+        that is a member expression, not an identifier
+        so to support these we wouldn't want to make assignee a string
+        because thats not a string
+*/
+export interface AssignmentExp extends Expression {
+    type: "AssignmentExp"
+    assignee: Expression
     value: Expression
 }
 

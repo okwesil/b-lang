@@ -1,6 +1,6 @@
 import { evaluate } from "../interpreter"
 import { Create, RuntimeValue, NumberValue } from "../values"
-import { BinaryExp, Identifier, Operator } from "../../frontend/ast"
+import { AssignmentExp, BinaryExp, Identifier, Operator } from "../../frontend/ast"
 import Environment from "../environment"
 
 
@@ -41,4 +41,12 @@ function solve(operator: Operator, left: number, right: number): number {
         case "^":
             return left ** right   
     }
+}
+
+
+export function evaluateAssignment(assignment: AssignmentExp, env: Environment): RuntimeValue {
+    if (assignment.assignee.type != "Identifier") {
+        throw new Error(`Invalid left-hand side assigment:\n ${JSON.stringify(assignment.assignee, null, 2)}`)
+    }
+    return env.assignVariable((assignment.assignee as Identifier).name, evaluate(assignment.value, env))
 }

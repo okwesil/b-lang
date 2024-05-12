@@ -17,10 +17,13 @@ export default class Environment {
         }
         this.variables.set(varname, Create.var(value, constant))
     }
-    public assignVariable(varname: string, value: RuntimeValue): void {
+    public assignVariable(varname: string, value: RuntimeValue): RuntimeValue {
         const env = this.resolve(varname)
+        if (env.lookup(varname).constant) {
+            throw new Error("Cannot assign value to constant")
+        }
         env.variables.set(varname, Create.var(value, env.lookup(varname).constant))
-        
+        return value
     }
     // finds variable in outer scopes
     public resolve(varname: string): Environment {
