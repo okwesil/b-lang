@@ -22,10 +22,9 @@ export default class Parser {
 
     /*
         format:
-        ( const | let ) identifier = expression
+        ( const | let ) identifier = expression;
         or
         ( const | let ) identifier;
-
     */
     private parse_variable_declaration(): Statement {
         const declarator = this.eat()

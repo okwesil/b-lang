@@ -5,7 +5,8 @@ export type NodeType =
     | "NumberLiteral" 
     | "Identifier" 
     | "BinaryExp" 
-    | "VariableDeclaration";
+    | "VariableDeclaration"
+    | "VariableAssignment";
 
 
 export type Operator = "+" | "-" | "*" | "/" | "%" | "^"
@@ -24,6 +25,12 @@ export interface VariableDeclaration extends Statement {
     constant: boolean
     identifier: string
     value?: Expression
+}
+
+export interface VariableAssignment extends Statement {
+    type: "VariableAssignment"
+    identifier: string
+    value: Expression
 }
 
 
