@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import Parser from "./frontend/parser"
 import { evaluate } from "./runtime/interpreter"
 import readline from "readline/promises"
@@ -8,9 +9,13 @@ import { Program } from "./frontend/ast"
 import { readFileSync } from "fs"
 
 const env = new Environment(null)
-env.declareVariable("true", Create.bool(true), true)
-env.declareVariable("false", Create.bool(false), true)
-env.declareVariable("null", Create.null(), true)
+
+const args = process.argv.slice(2)
+if (args[0] == "run") {
+    olog(evaluate(run(args[1]), env))
+} else {
+    repl()
+}
 
 
 async function ask(prompt: string): Promise<string> {
@@ -30,7 +35,7 @@ function run(filepath: string): Program {
 
 async function repl(): Promise<void> {
     const parser = new Parser();
-    console.log("B-Lang Repl v0.0.1")
+    console.log("B-Lang Repl v0.2.3")
     console.log("--------------\n")
     while (true) {
         const input = await ask("> ")
@@ -44,11 +49,6 @@ async function repl(): Promise<void> {
             console.clear()
             continue
         }
-        const splitted = input.split(" ")
-        if (splitted.length == 2 && splitted[0] == "run") {
-            olog(run(splitted[1]))
-            continue
-        }
 
         const program = parser.makeAST(input)
         console.log("\n")
@@ -60,5 +60,3 @@ async function repl(): Promise<void> {
 export function olog(object: Object) {
     console.log(JSON.stringify(object, null, 2))
 }
-
-repl()
