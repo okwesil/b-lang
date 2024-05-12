@@ -4,6 +4,8 @@ import readline from "readline/promises"
 // basically just a scope
 import Environment from "./runtime/environment"
 import { Create, NumberValue } from "./runtime/values"
+import { Program } from "./frontend/ast"
+import { readFileSync } from "fs"
 
 const env = new Environment(null)
 env.declareVariable("true", Create.bool(true), true)
@@ -21,6 +23,10 @@ async function ask(prompt: string): Promise<string> {
     return answer
 }
 
+function run(filepath: string): Program {
+    const sourceCode = readFileSync(filepath, { encoding: "utf8" })
+    return new Parser().makeAST(sourceCode)
+} 
 
 async function repl(): Promise<void> {
     const parser = new Parser();
@@ -36,6 +42,11 @@ async function repl(): Promise<void> {
         }
         if (input == "clear") {
             console.clear()
+            continue
+        }
+        const splitted = input.split(" ")
+        if (splitted.length == 2 && splitted[0] == "run") {
+            olog(run(splitted[1]))
             continue
         }
 
