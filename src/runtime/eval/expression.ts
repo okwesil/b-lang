@@ -21,7 +21,7 @@ export function evaluateBinaryExpression(binaryOp: BinaryExp, env: Environment):
  
 
 export function evaluateIdentifier(ident: Identifier, env: Environment): RuntimeValue {
-    let variable = env.lookup((ident as Identifier).name) as NumberValue
+    let variable = env.lookup((ident as Identifier).name).value 
     return variable
 }
 

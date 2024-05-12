@@ -6,9 +6,9 @@ import Environment from "./runtime/environment"
 import { Create, NumberValue } from "./runtime/values"
 
 const env = new Environment(null)
-env.declareVariable("true", Create.bool(true))
-env.declareVariable("false", Create.bool(false))
-env.declareVariable("null", Create.null())
+env.declareVariable("true", Create.bool(true), true)
+env.declareVariable("false", Create.bool(false), true)
+env.declareVariable("null", Create.null(), true)
 
 
 async function ask(prompt: string): Promise<string> {

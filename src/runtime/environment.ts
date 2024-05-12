@@ -1,26 +1,25 @@
-import { RuntimeValue } from "./values"
+import { Create, RuntimeValue, Variable } from "./values"
 
 
 export default class Environment {
     
     private parent: Environment | null
-    private variables: Map<string, RuntimeValue>
-
+    private variables: Map<string, Variable>
 
     constructor(parent: Environment | null) {
         this.parent = parent
         this.variables = new Map()
     }
 
-    public declareVariable(varname: string, value: RuntimeValue): void {
+    public declareVariable(varname: string, value: RuntimeValue, constant: boolean): void {
         if (this.variables.has(varname)) {
             throw new Error("Variable already declared: " + varname)
         }
-        this.variables.set(varname, value)
+        this.variables.set(varname, Create.var(value, constant))
     }
     public assignVariable(varname: string, value: RuntimeValue): void {
         const env = this.resolve(varname)
-        env.variables.set(varname, value)
+        env.variables.set(varname, Create.var(value, env.lookup(varname).constant))
         
     }
     // finds variable in outer scopes
@@ -39,9 +38,9 @@ export default class Environment {
         // call the parent's resolve to find the variable in that scope
         return this.parent.resolve(varname)
     }
-    public lookup(varname: string): RuntimeValue {
+    public lookup(varname: string): Variable {
         const env = this.resolve(varname)
-        return env.variables.get(varname) as RuntimeValue
+        return env.variables.get(varname) as Variable
     }
  
 }

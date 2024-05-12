@@ -19,6 +19,11 @@ export interface BooleanValue extends RuntimeValue {
     value: boolean
 }
 
+export interface Variable {
+    value: RuntimeValue
+    constant: boolean
+}
+
 export class Create {
     static number(value: number): NumberValue {
         return { type: "number", value }
@@ -28,5 +33,8 @@ export class Create {
     }
     static bool(value: boolean): BooleanValue {
         return { type: "boolean", value }
+    }
+    static var(value: RuntimeValue, constant: boolean): Variable {
+        return { value, constant }
     }
 }

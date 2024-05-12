@@ -4,7 +4,7 @@ import { evaluate } from "../interpreter"
 import Environment from "../environment"
 
 export function evaluateVariableDeclaration(declaration: VariableDeclaration, env: Environment): NullValue {
-    env.declareVariable(declaration.identifier, declaration.value ? evaluate(declaration.value as Expression, env): Create.null())
+    env.declareVariable(declaration.identifier, declaration.value ? evaluate(declaration.value, env): Create.null(), declaration.constant)
     return Create.null()
 }
 
