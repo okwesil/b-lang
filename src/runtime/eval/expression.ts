@@ -1,6 +1,6 @@
 import { evaluate } from "../interpreter"
-import { Create, NullValue, RuntimeValue, NumberValue } from "../values"
-import { BinaryExp, Expression, Identifier, Operator } from "../../frontend/ast"
+import { Create, RuntimeValue, NumberValue } from "../values"
+import { BinaryExp, Identifier, Operator } from "../../frontend/ast"
 import Environment from "../environment"
 
 

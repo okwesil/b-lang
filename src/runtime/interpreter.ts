@@ -1,5 +1,5 @@
-import { RuntimeValue, NumberValue, Create, NullValue } from "./values";
-import { BinaryExp, NumberLiteral, Statement, Operator, Program, isExpression, Identifier, VariableDeclaration, Expression} from "../frontend/ast";
+import { RuntimeValue, Create } from "./values";
+import { BinaryExp, NumberLiteral, Statement, Program, Identifier, VariableDeclaration} from "../frontend/ast";
 import Environment from "./environment";
 import { olog } from "../index"
 import { evaluateVariableDeclaration, evaluateProgram } from "./eval/statements";

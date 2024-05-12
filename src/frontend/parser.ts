@@ -1,4 +1,3 @@
-import { Create } from "../runtime/values"
 import { Program, Statement, Expression, BinaryExp, Identifier, NumberLiteral, VariableDeclaration } from "./ast"
 import { tokenize, Token, TokenType } from "./lexer"
 
