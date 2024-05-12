@@ -88,7 +88,9 @@ export default class Parser {
         if (this.get().type == TokenType.Equals) {
             this.eat() // go past equal sign
             const value = this.parse_assignment_expression()
-            return { value, assignee: left, type: "AssignmentExp" } as AssignmentExp
+            const expression = { value, assignee: left, type: "AssignmentExp" } as AssignmentExp
+            this.expect(TokenType.Semicolon, "Expected semicolon after variable declaration")
+            return expression
         }
 
         return left
