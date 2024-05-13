@@ -6,7 +6,9 @@ export type NodeType =
     | "Identifier" 
     | "BinaryExp" 
     | "VariableDeclaration"
-    | "AssignmentExp";
+    | "AssignmentExp"
+    | "Property"
+    | "ObjectLiteral";
 
 
 export type Operator = "+" | "-" | "*" | "/" | "%" | "^"
@@ -65,6 +67,16 @@ export interface NumberLiteral extends Expression {
     value: number
 }
 
+export interface ObjectLiteral extends Expression {
+    type: "ObjectLiteral",
+    properties: Property[] 
+}
+
+export interface Property extends Expression {
+    type: "Property",
+    key: string,
+    value?: Expression 
+}
 
 export interface Program extends Statement {
     type: "Program"
@@ -77,3 +89,4 @@ export function isExpression(statement: Statement): boolean {
     }
     return false
 }
+

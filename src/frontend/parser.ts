@@ -1,4 +1,4 @@
-import { Program, Statement, Expression, BinaryExp, Identifier, NumberLiteral, VariableDeclaration, AssignmentExp } from "./ast"
+import { Program, Statement, Expression, BinaryExp, Identifier, NumberLiteral, VariableDeclaration, AssignmentExp, Property, ObjectLiteral } from "./ast"
 import { tokenize, Token, TokenType } from "./lexer"
 
 export default class Parser {
@@ -70,7 +70,7 @@ export default class Parser {
     ComparisonExpr
     AdditiveExpr
     Multiplicative
-    ( exponential )
+    Exponential
     PrimaryExpr   - top
 
     */
@@ -78,22 +78,71 @@ export default class Parser {
 
 
     private parse_expression(): Expression {
-        return this.parse_assignment_expression()
+        return this.parse_object_expression()
     }
 
 
     private parse_assignment_expression(): Expression {
-        const left = this.parse_additive_expression() // in future switch out with objectExpr
+        const left = this.parse_object_expression() // in future switch out with objectExpr
         
         if (this.get().type == TokenType.Equals) {
             this.eat() // go past equal sign
-            const value = this.parse_assignment_expression()
+            const value = this.parse_object_expression()
             const expression = { value, assignee: left, type: "AssignmentExp" } as AssignmentExp
             this.expect(TokenType.Semicolon, "Expected semicolon after variable declaration")
             return expression
         }
 
         return left
+    }
+
+    private parse_object_expression(): Expression {
+        // expectation 1: { Property[] }
+
+        if (this.get().type != TokenType.OpenCurlyBrace) {
+            return this.parse_additive_expression()
+        }
+
+        this.eat() // eat open curly brace
+        const properties = new Array<Property>()
+
+        while(this.not_eof() && this.get().type != TokenType.CloseCurlyBrace) {
+            /*
+                Expectations:
+                { key: val, key2: val }
+                { key, key2 }
+                { key }
+            */
+
+            const key = this.expect(TokenType.Identifier, "Expected key in object literal").value;
+
+            // handles shorthand
+            // assuming key is a defined variable
+            // { key, key2 }
+            if (this.get().type == TokenType.Comma) {
+                this.eat() // go past comma
+                properties.push({ type: "Property", key,  })
+                continue
+                
+            // handles 1 key-value pair shorthand
+            // { key }
+            } else if (this.get().type == TokenType.CloseCurlyBrace) {
+                properties.push({ type: "Property", key })
+                continue
+            }
+
+            this.expect(TokenType.Colon, "Missing colon in key value pair")
+            const value = this.parse_expression()
+            properties.push({ type: "Property", key, value })
+
+            if (this.get().type != TokenType.CloseCurlyBrace) {
+                this.expect(TokenType.Comma, "Expected comma of closing curly brace after property")
+            }
+        }
+
+
+        this.expect(TokenType.CloseCurlyBrace, "Object should end in closing curly brace")
+        return { properties, type: "ObjectLiteral" } as ObjectLiteral
     }
 
 

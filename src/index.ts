@@ -4,7 +4,7 @@ import { evaluate } from "./runtime/interpreter"
 import readline from "readline/promises"
 // basically just a scope
 import Environment from "./runtime/environment"
-import { Create, NumberValue } from "./runtime/values"
+import { NumberValue } from "./runtime/values"
 import { Program } from "./frontend/ast"
 import { readFileSync } from "fs"
 

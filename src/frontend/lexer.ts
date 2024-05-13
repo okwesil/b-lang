@@ -15,8 +15,12 @@ export enum TokenType {
 
     OpenParen, CloseParen,
     OpenCurlyBrace, CloseCurlyBrace,
+    OpenBracket, CloseBracket,
     BinaryOperator,
     Semicolon,
+    Colon,
+    Comma,
+
     EOF, // end of file token type
 }
 
@@ -51,12 +55,25 @@ export function tokenize(sourceCode: string): Token[] {
         }
 
 
+        // one character tokens
         switch(src[0]) {
             case "(":
                 tokens.push(tokenFrom(src.shift(), TokenType.OpenParen))
                 continue;
             case ")":
                 tokens.push(tokenFrom(src.shift(), TokenType.CloseParen))
+                continue
+            case "{":
+                tokens.push(tokenFrom(src.shift(), TokenType.OpenCurlyBrace))
+                continue
+            case "}":
+                tokens.push(tokenFrom(src.shift(), TokenType.CloseCurlyBrace))
+                continue
+            case "[":
+                tokens.push(tokenFrom(src.shift(), TokenType.OpenBracket))
+                continue
+            case "]":
+                tokens.push(tokenFrom(src.shift(), TokenType.CloseBracket))
                 continue
             case "*":
             case "/":
@@ -69,18 +86,18 @@ export function tokenize(sourceCode: string): Token[] {
             case "=":
                 tokens.push(tokenFrom(src.shift(), TokenType.Equals))
                 continue
-            case "{":
-                tokens.push(tokenFrom(src.shift(), TokenType.OpenCurlyBrace))
-                continue
-            case "}":
-                tokens.push(tokenFrom(src.shift(), TokenType.CloseCurlyBrace))
-                continue
             case ";":
                 tokens.push(tokenFrom(src.shift(), TokenType.Semicolon))
                 continue
+            case ",":
+                tokens.push(tokenFrom(src.shift(), TokenType.Comma))
+                continue
+            case ":": 
+                tokens.push(tokenFrom(src.shift(), TokenType.Colon))
+                continue
         }
-        //handle multi-character tokens
-
+    
+        //multi-character tokens
         //build number token
         if (isint(src[0])) {
             let num = ""

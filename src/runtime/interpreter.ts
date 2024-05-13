@@ -25,7 +25,7 @@ export function evaluate(astNode: Statement, env: Environment): RuntimeValue {
             return evaluateProgram(astNode as Program, env)
         default:
             console.error("AST Node not setup: ")
-            olog(astNode)
+            console.log(JSON.stringify(astNode, null, 2))
             process.exit()
     }
 }
