@@ -1,5 +1,3 @@
-import Environment from "./environment"
-
 export type ValueType = "null" | "number" | "boolean" | "object"
 
 export interface RuntimeValue {
@@ -44,12 +42,5 @@ export class Create {
     }
     static var(value: RuntimeValue, constant: boolean): Variable {
         return { value, constant }
-    }
-    static globalEnv(): Environment {
-        const env = new Environment(null)
-        env.declareVariable("null", Create.null(), true)
-        env.declareVariable("true", Create.bool(true), true)
-        env.declareVariable("false", Create.bool(false), true)
-        return env
     }
 }

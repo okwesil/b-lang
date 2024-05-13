@@ -3,11 +3,12 @@ import Parser from "./frontend/parser"
 import { evaluate } from "./runtime/interpreter"
 import readline from "readline/promises"
 // basically just a scope
-import { Create, NumberValue } from "./runtime/values"
+import {  NumberValue } from "./runtime/values"
 import { Program } from "./frontend/ast"
 import { readFileSync } from "fs"
+import { createGlobalScope } from "./runtime/environment"
 
-const env = Create.globalEnv()
+const env = createGlobalScope()
 
 const args = process.argv.slice(2)
 if (args[0] == "run") {

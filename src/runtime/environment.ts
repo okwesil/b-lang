@@ -1,5 +1,14 @@
 import { Create, RuntimeValue, Variable } from "./values"
 
+export function createGlobalScope(): Environment {
+    const env = new Environment(null)
+    env.declareVariable("null", Create.null(), true)
+    env.declareVariable("true", Create.bool(true), true)
+    env.declareVariable("false", Create.bool(false), true)
+    return env
+}
+
+
 export default class Environment {
     
     private parent: Environment | null

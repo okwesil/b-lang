@@ -1,5 +1,5 @@
 import { Create, RuntimeValue, NullValue } from "../values"
-import {  VariableDeclaration, Program, Expression } from "../../frontend/ast"
+import {  VariableDeclaration, Program  } from "../../frontend/ast"
 import { evaluate } from "../interpreter"
 import Environment from "../environment"
 
