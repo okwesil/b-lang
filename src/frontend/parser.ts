@@ -231,7 +231,7 @@ export default class Parser {
                 return value
             default:
                 process.exitCode = 101
-                console.error(`Invalid or unexpected token found while parsing: { type: ${this.get().type}, value: ${this.get().value} }`)
+                console.error("Invalid or unexpected token found while parsing:\n" + JSON.stringify(this.get(), null, 2))
                 process.exit()
             
         }

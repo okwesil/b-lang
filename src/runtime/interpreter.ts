@@ -1,9 +1,8 @@
 import { RuntimeValue, Create } from "./values";
-import { BinaryExp, NumberLiteral, Statement, Program, Identifier, VariableDeclaration, AssignmentExp} from "../frontend/ast";
+import { BinaryExp, NumberLiteral, Statement, Program, Identifier, VariableDeclaration, AssignmentExp, ObjectLiteral} from "../frontend/ast";
 import Environment from "./environment";
-import { olog } from "../index"
 import { evaluateVariableDeclaration, evaluateProgram } from "./eval/statements";
-import { evaluateAssignment, evaluateBinaryExpression, evaluateIdentifier } from "./eval/expressions";
+import { evaluateAssignment, evaluateBinaryExpression, evaluateIdentifier, evaluateObjectExpression } from "./eval/expressions";
 
 export function evaluate(astNode: Statement, env: Environment): RuntimeValue {
     switch(astNode.type) {
@@ -12,6 +11,8 @@ export function evaluate(astNode: Statement, env: Environment): RuntimeValue {
             return Create.number((astNode as NumberLiteral).value)
         case "Identifier":
            return evaluateIdentifier(astNode as Identifier, env)
+        case "ObjectLiteral":
+            return evaluateObjectExpression(astNode as ObjectLiteral, env)
         case "BinaryExp":
             return evaluateBinaryExpression(astNode as BinaryExp, env)
         case "AssignmentExp":

@@ -2,6 +2,8 @@
 export interface Token {
     value: string
     type: TokenType
+    line: number
+    col: number
 }
 
 export enum TokenType {
@@ -40,17 +42,29 @@ function isint(str: any): boolean {
 }
 
 function isskippable(str: string): boolean {
-    return str == " " || str == "\n" || str == "\t"
+    return str == " " || str == "\n" || str == "\t" || str == "\r"
 }
 
 export function tokenize(sourceCode: string): Token[] {
     const tokens = new Array<Token>()
     const src = sourceCode.split("")    
+    let location = {
+        line: 1,
+        col: 1
+    }
 
     //build each token
     while (src.length > 0) {
         if (isskippable(src[0])) {
-            src.shift()
+            let char = src.shift()
+            switch(char) {
+                case "\n":
+                    location.line++
+                    location.col = 1
+                    break
+                case " ":
+                    location.col++
+            }
             continue
         }
 
@@ -58,22 +72,28 @@ export function tokenize(sourceCode: string): Token[] {
         // one character tokens
         switch(src[0]) {
             case "(":
-                tokens.push(tokenFrom(src.shift(), TokenType.OpenParen))
+                tokens.push(tokenFrom(src.shift(), TokenType.OpenParen, location.line, location.col))
+                location.col++
                 continue;
             case ")":
-                tokens.push(tokenFrom(src.shift(), TokenType.CloseParen))
+                tokens.push(tokenFrom(src.shift(), TokenType.CloseParen, location.line, location.col))
+                location.col++
                 continue
             case "{":
-                tokens.push(tokenFrom(src.shift(), TokenType.OpenCurlyBrace))
+                tokens.push(tokenFrom(src.shift(), TokenType.OpenCurlyBrace, location.line, location.col))
+                location.col++
                 continue
             case "}":
-                tokens.push(tokenFrom(src.shift(), TokenType.CloseCurlyBrace))
+                tokens.push(tokenFrom(src.shift(), TokenType.CloseCurlyBrace, location.line, location.col))
+                location.col++
                 continue
             case "[":
-                tokens.push(tokenFrom(src.shift(), TokenType.OpenBracket))
+                tokens.push(tokenFrom(src.shift(), TokenType.OpenBracket, location.line, location.col))
+                location.col++
                 continue
             case "]":
-                tokens.push(tokenFrom(src.shift(), TokenType.CloseBracket))
+                tokens.push(tokenFrom(src.shift(), TokenType.CloseBracket, location.line, location.col))
+                location.col++
                 continue
             case "*":
             case "/":
@@ -81,19 +101,24 @@ export function tokenize(sourceCode: string): Token[] {
             case "-":
             case "%":
             case "^":
-                tokens.push(tokenFrom(src.shift(), TokenType.BinaryOperator))
+                tokens.push(tokenFrom(src.shift(), TokenType.BinaryOperator, location.line, location.col))
+                location.col++
                 continue
             case "=":
-                tokens.push(tokenFrom(src.shift(), TokenType.Equals))
+                tokens.push(tokenFrom(src.shift(), TokenType.Equals, location.line, location.col))
+                location.col++
                 continue
             case ";":
-                tokens.push(tokenFrom(src.shift(), TokenType.Semicolon))
+                tokens.push(tokenFrom(src.shift(), TokenType.Semicolon, location.line, location.col))
+                location.col++
                 continue
             case ",":
-                tokens.push(tokenFrom(src.shift(), TokenType.Comma))
+                tokens.push(tokenFrom(src.shift(), TokenType.Comma, location.line, location.col))
+                location.col++
                 continue
             case ":": 
-                tokens.push(tokenFrom(src.shift(), TokenType.Colon))
+                tokens.push(tokenFrom(src.shift(), TokenType.Colon, location.line, location.col))
+                location.col++
                 continue
         }
     
@@ -103,26 +128,29 @@ export function tokenize(sourceCode: string): Token[] {
             let num = ""
             while (src.length > 0 && isint(src[0])) {
                 num += src.shift()
+                location.col++
                 // to get decimals
                 if (src[1] == "." && isint(src[2])) {
                     num += src.shift()
                     num += src.shift()
+                    location.col += 2
                 }
             }
-            tokens.push(tokenFrom(num, TokenType.Number))
+            tokens.push(tokenFrom(num, TokenType.Number, location.line, location.col))
             
         } else if (isalpha(src[0])) {
             let indentifier = ""
             while (src.length > 0 && isalpha(src[0])) {
                 indentifier += src.shift()
+                location.col++
             }
 
             //check for reserved tokens before pushing
             const reserved = KEYWORDS[indentifier]
             if (!reserved)  {
-                tokens.push(tokenFrom(indentifier, TokenType.Identifier))
+                tokens.push(tokenFrom(indentifier, TokenType.Identifier, location.line, location.col))
             } else {
-                tokens.push(tokenFrom(indentifier, reserved))
+                tokens.push(tokenFrom(indentifier, reserved, location.line, location.col))
             }
         }  else {
 
@@ -133,15 +161,15 @@ export function tokenize(sourceCode: string): Token[] {
 
         }
 
-
     }
-    tokens.push({ value: "EndofFile", type: TokenType.EOF })
+    tokens.push({ value: "EndofFile", type: TokenType.EOF, line: location.line, col: location.col })
 
 
     return tokens
 } 
 
 
-function tokenFrom(value: string = "", type: TokenType): Token {
-    return {value, type}
+function tokenFrom(value: string = "", type: TokenType, line: number, col: number): Token {
+
+    return {value, type, line, col}
 }

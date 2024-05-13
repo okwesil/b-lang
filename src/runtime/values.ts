@@ -1,4 +1,4 @@
-export type ValueType = "null" | "number" | "boolean"
+export type ValueType = "null" | "number" | "boolean" | "object"
 
 export interface RuntimeValue {
     type: ValueType
@@ -23,6 +23,12 @@ export interface Variable {
     value: RuntimeValue
     constant: boolean
 }
+
+export interface ObjectValue extends RuntimeValue {
+    type: "object"
+    properties: Map<string, RuntimeValue>
+}
+
 
 export class Create {
     static number(value: number): NumberValue {

@@ -1,6 +1,6 @@
 import { evaluate } from "../interpreter"
-import { Create, RuntimeValue, NumberValue } from "../values"
-import { AssignmentExp, BinaryExp, Identifier, Operator } from "../../frontend/ast"
+import { Create, RuntimeValue, NumberValue, ObjectValue } from "../values"
+import { AssignmentExp, BinaryExp, Identifier, ObjectLiteral, Operator } from "../../frontend/ast"
 import Environment from "../environment"
 
 
@@ -49,4 +49,17 @@ export function evaluateAssignment(assignment: AssignmentExp, env: Environment):
         throw new Error(`Invalid left-hand side assigment:\n ${JSON.stringify(assignment.assignee, null, 2)}`)
     }
     return env.assignVariable((assignment.assignee as Identifier).name, evaluate(assignment.value, env))
+}
+
+export function evaluateObjectExpression(literal: ObjectLiteral, env: Environment): RuntimeValue {
+    const object: ObjectValue = {
+        type: "object",
+        properties: new Map()
+    }
+    for (const prop of literal.properties) {
+        const runtimeValue = !prop.value ? env.lookup(prop.key).value: evaluate(prop.value, env)        
+
+        object.properties.set(prop.key, runtimeValue)
+    }
+    return object
 }

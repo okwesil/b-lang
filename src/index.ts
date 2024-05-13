@@ -4,7 +4,7 @@ import { evaluate } from "./runtime/interpreter"
 import readline from "readline/promises"
 // basically just a scope
 import Environment from "./runtime/environment"
-import { NumberValue } from "./runtime/values"
+import { NumberValue, ObjectValue } from "./runtime/values"
 import { Program } from "./frontend/ast"
 import { readFileSync } from "fs"
 
@@ -12,7 +12,8 @@ const env = new Environment(null)
 
 const args = process.argv.slice(2)
 if (args[0] == "run") {
-    olog(evaluate(run(args[1]), env))
+    let value = evaluate(run(args[1]), env)
+    console.log((value as ObjectValue).properties)
 } else {
     repl()
 }
