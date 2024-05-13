@@ -12,8 +12,7 @@ const env = new Environment(null)
 
 const args = process.argv.slice(2)
 if (args[0] == "run") {
-    let value = evaluate(run(args[1]), env)
-    console.log((value as ObjectValue).properties)
+    olog(evaluate(run(args[1]), env))
 } else {
     repl()
 }

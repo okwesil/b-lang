@@ -138,9 +138,9 @@ export function tokenize(sourceCode: string): Token[] {
             }
             tokens.push(tokenFrom(num, TokenType.Number, location.line, location.col))
             
-        } else if (isalpha(src[0])) {
+        } else if (isalpha(src[0]) || src[0] == "_") {
             let indentifier = ""
-            while (src.length > 0 && isalpha(src[0])) {
+            while (src.length > 0 && (isalpha(src[0]) || src[0] == "_")) {
                 indentifier += src.shift()
                 location.col++
             }
