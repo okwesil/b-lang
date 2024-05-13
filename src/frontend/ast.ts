@@ -83,10 +83,4 @@ export interface Program extends Statement {
     body: Statement[]
 }
 
-export function isExpression(statement: Statement): boolean {
-    if (statement.type != "Program") {
-        return true
-    }
-    return false
-}
 
