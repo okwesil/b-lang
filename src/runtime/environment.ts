@@ -1,13 +1,5 @@
 import { Create, RuntimeValue, Variable } from "./values"
 
-
-function initScope(env: Environment) {
-    env.declareVariable("null", Create.null(), true)
-    env.declareVariable("true", Create.bool(true), true)
-    env.declareVariable("false", Create.bool(false), true)
-}
-
-
 export default class Environment {
     
     private parent: Environment | null
@@ -17,9 +9,6 @@ export default class Environment {
         this.parent = parent
         this.variables = new Map()
 
-        if (!parent) {
-            initScope(this)
-        }
     }
 
     public declareVariable(varname: string, value: RuntimeValue, constant: boolean): void {
