@@ -1,6 +1,6 @@
 import { evaluate } from "../interpreter"
-import { Create, RuntimeValue, NumberValue, ObjectValue } from "../values"
-import { AssignmentExp, BinaryExp, Identifier, ObjectLiteral, Operator } from "../../frontend/ast"
+import { Create, RuntimeValue, NumberValue, ObjectValue, NativeFunctionValue } from "../values"
+import { AssignmentExp, BinaryExp, CallExp, Identifier, ObjectLiteral, Operator } from "../../frontend/ast"
 import Environment from "../environment"
 
 
@@ -62,4 +62,17 @@ export function evaluateObjectExpression(literal: ObjectLiteral, env: Environmen
         object.properties.set(prop.key, runtimeValue)
     }
     return object
+}
+
+export function evaluateCallExpression(expression: CallExp, env: Environment): RuntimeValue {
+    const args = expression.args.map(arg => evaluate(arg, env))
+    const fn = evaluate(expression.caller, env)
+
+    if (fn.type != "native-function") {
+        throw new Error("Cannot call non native function:\n" + JSON.stringify(fn, null, 2))
+    }
+
+    let result = (fn as NativeFunctionValue).call(args, env)
+
+    return result
 }

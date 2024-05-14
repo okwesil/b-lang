@@ -1,4 +1,6 @@
-export type ValueType = "null" | "number" | "boolean" | "object"
+import Environment from "./environment"
+
+export type ValueType = "null" | "number" | "boolean" | "object" | "native-function"
 
 export interface RuntimeValue {
     type: ValueType
@@ -29,6 +31,12 @@ export interface ObjectValue extends RuntimeValue {
     properties: Map<string, RuntimeValue>
 }
 
+export interface NativeFunctionValue extends RuntimeValue {
+    type: "native-function"
+    call: FunctionCall
+}
+
+export type FunctionCall = ( args: RuntimeValue[], env: Environment ) => RuntimeValue
 
 export class Create {
     static number(value: number): NumberValue {
@@ -42,5 +50,8 @@ export class Create {
     }
     static var(value: RuntimeValue, constant: boolean): Variable {
         return { value, constant }
+    }
+    static nativeFn(call: FunctionCall): NativeFunctionValue {
+        return { type: "native-function", call } 
     }
 }

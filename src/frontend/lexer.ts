@@ -1,3 +1,5 @@
+import { toss } from "../runtime/interpreter"
+
 // let happy = 45 + ( foo * bar )
 export interface Token {
     value: string
@@ -160,9 +162,7 @@ export function tokenize(sourceCode: string): Token[] {
         }  else {
 
             // If made it here that means unexpected token
-            process.exitCode = 100
-            console.error("Unexpected token: " + src[0])
-            process.exit()
+            toss("Unexpected token: ", 100, location.line, location.col)
 
         }
 

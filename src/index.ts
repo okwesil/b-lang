@@ -52,7 +52,7 @@ async function repl(): Promise<void> {
 
         const program = parser.makeAST(input)
         console.log("\n")
-        console.log((evaluate(program, env) as NumberValue).value)
+        console.log(evaluate(program, env))
         console.log("-------------\n")
     }
 }

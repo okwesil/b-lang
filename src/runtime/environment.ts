@@ -1,13 +1,20 @@
-import { Create, RuntimeValue, Variable } from "./values"
+import { pow, println } from "./natives-functions"
+import { Create, NumberValue, RuntimeValue, Variable } from "./values"
 
 export function createGlobalScope(): Environment {
     const env = new Environment(null)
     env.declareVariable("null", Create.null(), true)
     env.declareVariable("true", Create.bool(true), true)
     env.declareVariable("false", Create.bool(false), true)
+
+    // define a native function
+
+    env.declareVariable("println", Create.nativeFn(println), true)
+    env.declareVariable("pow", Create.nativeFn(pow), true)
+    env.declareVariable("date", Create.nativeFn((args, env) => Create.number(Date.now())), true)
+
     return env
 }
-
 
 export default class Environment {
     
