@@ -1,4 +1,4 @@
-import { Program, Statement, Expression, BinaryExp, Identifier, NumberLiteral, VariableDeclaration, AssignmentExp, Property, ObjectLiteral } from "./ast"
+import { Program, Statement, Expression, BinaryExp, Identifier, NumberLiteral, VariableDeclaration, AssignmentExp, Property, ObjectLiteral, CallExp, MemberExp } from "./ast"
 import { tokenize, Token, TokenType } from "./lexer"
 
 export default class Parser {
@@ -65,12 +65,12 @@ export default class Parser {
     ( Order of Evaluation )
 
     AssignmentExpr - bottom 
-    MemberExpr
-    FunctionCall
-    ComparisonExpr
+    Object
     AdditiveExpr
     Multiplicative
     Exponential
+    FunctionCall
+    MemberExpr
     PrimaryExpr   - top
 
     */
@@ -78,13 +78,12 @@ export default class Parser {
 
 
     private parse_expression(): Expression {
-        return this.parse_object_expression()
+        return this.parse_assignment_expression()
     }
 
 
     private parse_assignment_expression(): Expression {
-        const left = this.parse_object_expression() // in future switch out with objectExpr
-        
+        const left = this.parse_object_expression() 
         if (this.get().type == TokenType.Equals) {
             this.eat() // go past equal sign
             const value = this.parse_object_expression()
@@ -190,7 +189,7 @@ export default class Parser {
     }
 
     private parse_exponential_expression(): Expression {
-        let left = this.parse_primary_expression()
+        let left = this.parse_call_member_expression()
 
         // while there is still an operator
         while
@@ -198,7 +197,7 @@ export default class Parser {
             this.get().value == "^" 
         ) {
             const operator = this.eat().value
-            const right = this.parse_primary_expression()
+            const right = this.parse_call_member_expression()
             left = {
                 type: "BinaryExp",
                 left,
@@ -210,7 +209,101 @@ export default class Parser {
 
         return left
     }
- 
+
+    // if object member is a function
+    private parse_call_member_expression(): Expression {
+        const member = this.parse_member_expression()
+
+        if (this.get().type == TokenType.OpenParen) {
+            return this.parse_call_expression(member)
+        } 
+        return member
+    }
+
+    private parse_call_expression(caller: Expression): Expression {
+        this.eat()
+        let callExp: CallExp = { 
+            type: "CallExp",
+            caller,
+            args: this.parse_args()
+        }
+        // obj.func()()
+        // obj.func returns a func, so we want to handle this
+        if (this.get().type == TokenType.OpenParen) {
+            callExp = this.parse_call_expression(callExp) as CallExp
+        }
+        return callExp
+    }
+
+    /* 
+        add(num1, func())
+            ^^^^^^^^^^^^
+           these are arguments; values passed to a 
+           when its called / at runtime
+        
+        fn add(num1, num2) { Body }
+               ^^^^^^^^^^  
+            parameters are variables that a function is defined with
+
+        sum: arguments are what you pass into a function,
+            parameters are the arguments the function expects    
+
+    */
+
+    private parse_args(): Expression[] {
+        const args = this.get().type == TokenType.CloseParen
+            ? [] 
+            : this.parse_argument_list()
+
+        this.expect(TokenType.CloseParen, "Expected closing parentheses arfter argument list")
+        return args    
+    }
+    
+    // helper for ^^^
+    private parse_argument_list(): Expression[] {
+        const args: Expression[] = [this.parse_assignment_expression()] // first value
+        /* 
+            parse assignment because:
+            let num = 5;
+            add(num = 1, 7)
+            that's valid code right there
+        */
+        while (this.get().type == TokenType.Comma && this.eat()) {
+            args.push(this.parse_assignment_expression())
+        }
+        return args
+    }
+
+    private parse_member_expression(): Expression {
+        let object = this.parse_primary_expression()
+
+        while (this.get().type == TokenType.Dot || this.get().type == TokenType.OpenBracket) {
+            const operator = this.eat() // . or [
+            let property: Expression
+            let computed: boolean
+
+            // non-computed
+            // foo.bar
+            if (operator.type == TokenType.Dot) {
+                computed = false
+                property = this.parse_primary_expression() // should be identifier
+                if (property.type != "Identifier") {
+                    throw new Error("Computed member expression value must be an identifier")
+                }
+
+
+                // computed
+                // foo["bar"]
+            } else {
+                computed = true
+                property = this.parse_expression()
+                this.expect(TokenType.CloseBracket, "Missing closing bracket in computed object expression")
+            }
+
+            object = { type: "MemberExp", object, computed, property } as MemberExp
+        }
+        return object
+    }
 
     // evaluates a token to a value (kinda)
     private parse_primary_expression(): Expression {
@@ -231,9 +324,7 @@ export default class Parser {
                 return value
             default:
                 process.exitCode = 101
-                console.error("Invalid or unexpected token found while parsing:\n" + JSON.stringify(this.get(), null, 2))
-                process.exit()
-            
+                throw new Error("Invalid or unexpected token found while parsing:\n" + JSON.stringify(this.get(), null, 2))
         }
     }
 

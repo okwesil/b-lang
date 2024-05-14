@@ -22,6 +22,7 @@ export enum TokenType {
     Semicolon,
     Colon,
     Comma,
+    Dot,
 
     EOF, // end of file token type
 }
@@ -118,6 +119,10 @@ export function tokenize(sourceCode: string): Token[] {
                 continue
             case ":": 
                 tokens.push(tokenFrom(src.shift(), TokenType.Colon, location.line, location.col))
+                location.col++
+                continue
+            case ".":
+                tokens.push(tokenFrom(src.shift(), TokenType.Dot, location.line, location.col))
                 location.col++
                 continue
         }

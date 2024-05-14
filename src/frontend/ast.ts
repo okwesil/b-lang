@@ -1,14 +1,18 @@
 import { RuntimeValue } from "../runtime/values"
 
 export type NodeType = 
+    // statements
     "Program" 
+    | "VariableDeclaration"
+    // expressions
     | "NumberLiteral" 
     | "Identifier" 
     | "BinaryExp" 
-    | "VariableDeclaration"
     | "AssignmentExp"
     | "Property"
-    | "ObjectLiteral";
+    | "ObjectLiteral"
+    | "MemberExp"
+    | "CallExp"
 
 
 export type Operator = "+" | "-" | "*" | "/" | "%" | "^"
@@ -81,6 +85,19 @@ export interface Property extends Expression {
 export interface Program extends Statement {
     type: "Program"
     body: Statement[]
+}
+
+export interface MemberExp extends Expression {
+    type: "MemberExp",
+    object: Expression
+    property: Expression
+    computed: boolean
+}
+
+export interface CallExp extends Expression {
+    type: "CallExp",
+    args: Expression[],
+    caller: Expression
 }
 
 
