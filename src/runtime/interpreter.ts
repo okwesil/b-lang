@@ -1,8 +1,8 @@
 import { RuntimeValue, Create } from "./values";
-import { BinaryExp, NumberLiteral, Statement, Program, Identifier, VariableDeclaration, AssignmentExp, ObjectLiteral, CallExp, StringLiteral} from "../frontend/ast";
+import { BinaryExp, NumberLiteral, Statement, Program, Identifier, VariableDeclaration, AssignmentExp, ObjectLiteral, CallExp, StringLiteral, MemberExp} from "../frontend/ast";
 import Environment from "./environment";
 import { evaluateVariableDeclaration, evaluateProgram } from "./eval/statements";
-import { evaluateAssignment, evaluateBinaryExpression, evaluateCallExpression, evaluateIdentifier, evaluateObjectExpression } from "./eval/expressions";
+import { evaluateAssignment, evaluateBinaryExpression, evaluateCallExpression, evaluateIdentifier, evaluateMemberExpression, evaluateObjectExpression } from "./eval/expressions";
 
 export function evaluate(astNode: Statement, env: Environment): RuntimeValue {
     switch(astNode.type) {
@@ -21,6 +21,8 @@ export function evaluate(astNode: Statement, env: Environment): RuntimeValue {
             return evaluateAssignment(astNode as AssignmentExp, env)
         case "CallExp":
             return evaluateCallExpression(astNode as CallExp, env)
+        case "MemberExp":
+            return evaluateMemberExpression(astNode as MemberExp, env)
 
         // statements 
         case "VariableDeclaration":
