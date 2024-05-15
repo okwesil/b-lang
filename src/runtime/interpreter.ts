@@ -1,5 +1,5 @@
 import { RuntimeValue, Create } from "./values";
-import { BinaryExp, NumberLiteral, Statement, Program, Identifier, VariableDeclaration, AssignmentExp, ObjectLiteral, CallExp} from "../frontend/ast";
+import { BinaryExp, NumberLiteral, Statement, Program, Identifier, VariableDeclaration, AssignmentExp, ObjectLiteral, CallExp, StringLiteral} from "../frontend/ast";
 import Environment from "./environment";
 import { evaluateVariableDeclaration, evaluateProgram } from "./eval/statements";
 import { evaluateAssignment, evaluateBinaryExpression, evaluateCallExpression, evaluateIdentifier, evaluateObjectExpression } from "./eval/expressions";
@@ -9,6 +9,8 @@ export function evaluate(astNode: Statement, env: Environment): RuntimeValue {
         // expression
         case "NumberLiteral":
             return Create.number((astNode as NumberLiteral).value)
+        case "StringLiteral":
+            return Create.string((astNode as StringLiteral).value)
         case "Identifier":
            return evaluateIdentifier(astNode as Identifier, env)
         case "ObjectLiteral":

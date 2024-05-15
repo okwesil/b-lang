@@ -144,8 +144,9 @@ export function tokenize(sourceCode: string): Token[] {
                 }
             }
             tokens.push(tokenFrom(num, TokenType.Number, location.line, location.col))
-            
-        } else if (isalpha(src[0]) || src[0] == "_") {
+            continue
+        }  
+        if (isalpha(src[0]) || src[0] == "_") {
             let indentifier = ""
             while (src.length > 0 && (isalpha(src[0]) || src[0] == "_")) {
                 indentifier += src.shift()
@@ -159,12 +160,23 @@ export function tokenize(sourceCode: string): Token[] {
             } else {
                 tokens.push(tokenFrom(indentifier, reserved, location.line, location.col))
             }
-        }  else {
-
-            // If made it here that means unexpected token
-            toss("Unexpected token: ", 100, location.line, location.col)
-
+            continue
+        } 
+        if (src[0] == "\"") {
+            let str = ""
+            src.shift() // get rid of opening quote
+            while (src.length > 0 && src[0] != "\"") {
+                str += src.shift()
+                location.col++
+            }
+            src.shift() // get rid of closing quote
+            tokens.push(tokenFrom(str, TokenType.String, location.line, location.col))
+            continue
         }
+
+
+        // If made it here that means unexpected token
+        toss("Unexpected token: ", 100, location.line, location.col)
 
     }
     tokens.push({ value: "EndofFile", type: TokenType.EOF, line: location.line, col: location.col })

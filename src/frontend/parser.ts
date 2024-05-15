@@ -1,4 +1,4 @@
-import { Program, Statement, Expression, BinaryExp, Identifier, NumberLiteral, VariableDeclaration, AssignmentExp, Property, ObjectLiteral, CallExp, MemberExp } from "./ast"
+import { Program, Statement, Expression, BinaryExp, Identifier, NumberLiteral, VariableDeclaration, AssignmentExp, Property, ObjectLiteral, CallExp, MemberExp, StringLiteral } from "./ast"
 import { tokenize, Token, TokenType } from "./lexer"
 
 export default class Parser {
@@ -314,6 +314,8 @@ export default class Parser {
                 return { type: "Identifier", name: this.eat().value } as Identifier
             case TokenType.Number: 
                 return { type: "NumberLiteral", value: parseFloat(this.eat().value) } as NumberLiteral
+            case TokenType.String:
+                return { type: "StringLiteral", value: this.eat().value } as StringLiteral
             case TokenType.OpenParen: 
                 this.eat() // eat the opening paren
                 const value = this.parse_expression() // parse parenthesis contents
