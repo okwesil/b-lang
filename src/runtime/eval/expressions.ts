@@ -1,7 +1,8 @@
 import { evaluate, toss } from "../interpreter"
-import { Create, RuntimeValue, NumberValue, ObjectValue, NativeFunctionValue, StringValue } from "../values"
+import { Create, RuntimeValue, NumberValue, ObjectValue, NativeFunctionValue, StringValue, FunctionValue } from "../values"
 import { AssignmentExp, BinaryExp, CallExp, Identifier, MemberExp, ObjectLiteral, Operator } from "../../frontend/ast"
 import Environment from "../environment"
+import { runFunction } from "./statements"
 
 
 export function evaluateBinaryExpression(binaryOp: BinaryExp, env: Environment): RuntimeValue {
@@ -90,7 +91,7 @@ export function evaluateCallExpression(expression: CallExp, env: Environment): R
     const fn = evaluate(expression.caller, env)
 
     if (fn.type != "native-function") {
-        throw new Error("Cannot call non native function:\n" + JSON.stringify(fn, null, 2))
+        return runFunction((fn as FunctionValue), env)
     }
 
     let result = (fn as NativeFunctionValue).call(args, env)

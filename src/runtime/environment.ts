@@ -1,4 +1,4 @@
-import { pow, println } from "./natives-functions"
+import { pow, print as _print, println } from "./natives-functions"
 import { Create, NumberValue, RuntimeValue, Variable } from "./values"
 
 export function createGlobalScope(): Environment {
@@ -10,6 +10,7 @@ export function createGlobalScope(): Environment {
     // define a native function
 
     env.declareVariable("println", Create.nativeFn(println), true)
+    env.declareVariable("print", Create.nativeFn(_print), true)
     env.declareVariable("pow", Create.nativeFn(pow), true)
     env.declareVariable("date", Create.nativeFn((args, env) => Create.number(Date.now())), true)
 

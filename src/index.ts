@@ -12,7 +12,7 @@ const env = createGlobalScope()
 
 const args = process.argv.slice(2)
 if (args[0] == "run") {
-    olog(evaluate(run(args[1]), env))
+    evaluate(run(args[1]), env)
 } else {
     repl()
 }

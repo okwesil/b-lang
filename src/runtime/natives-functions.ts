@@ -22,4 +22,11 @@ export const println: FunctionCall = (args, env) => {
     process.stdout.write(str)
     return Create.null()
 }
-
+export const print: FunctionCall = (args, env) => {
+    let str: string = ""
+    for (const arg of args) {
+        str += " " + (arg as NumberValue).value
+    }
+    process.stdout.write(str)
+    return Create.null()
+}

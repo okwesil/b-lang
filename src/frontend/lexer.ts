@@ -16,6 +16,8 @@ export enum TokenType {
     Equals,
     MutableVar,
     ConstantVar,
+    Function,
+    Return,
 
     OpenParen, CloseParen,
     OpenCurlyBrace, CloseCurlyBrace,
@@ -31,7 +33,9 @@ export enum TokenType {
 
 const KEYWORDS: Record<string, TokenType> = {
     "let": TokenType.MutableVar,
-    "const": TokenType.ConstantVar
+    "const": TokenType.ConstantVar,
+    "fn": TokenType.Function,
+    "return": TokenType.Return
 }
 
 

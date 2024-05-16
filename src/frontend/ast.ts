@@ -4,6 +4,8 @@ export type NodeType =
     // statements
     "Program" 
     | "VariableDeclaration"
+    | "FunctionDeclaration"
+    | "ReturnStatement"
     // expressions
     | "NumberLiteral" 
     | "StringLiteral"
@@ -32,6 +34,18 @@ export interface VariableDeclaration extends Statement {
     constant: boolean
     identifier: string
     value?: Expression
+}
+
+export interface FunctionDeclaration extends Statement {
+    type: "FunctionDeclaration"
+    name: Identifier 
+    params: Identifier[]
+    body: Statement[]
+}
+
+export interface ReturnStatement extends Statement {
+    type: "ReturnStatement"
+    value: Expression,
 }
 
 /*

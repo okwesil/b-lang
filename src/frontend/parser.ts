@@ -1,4 +1,20 @@
-import { Program, Statement, Expression, BinaryExp, Identifier, NumberLiteral, VariableDeclaration, AssignmentExp, Property, ObjectLiteral, CallExp, MemberExp, StringLiteral } from "./ast"
+import { toss } from "../runtime/interpreter"
+import { 
+    Program,
+    Statement, 
+    Expression, 
+    BinaryExp, 
+    Identifier, 
+    NumberLiteral,
+    StringLiteral,  
+    VariableDeclaration, 
+    FunctionDeclaration,
+    AssignmentExp, 
+    Property, 
+    ObjectLiteral, 
+    CallExp, MemberExp,
+    ReturnStatement, 
+} from "./ast"
 import { tokenize, Token, TokenType } from "./lexer"
 
 export default class Parser {
@@ -14,6 +30,10 @@ export default class Parser {
             case TokenType.MutableVar:
             case TokenType.ConstantVar:
                 return this.parse_variable_declaration()
+            case TokenType.Function:
+                return this.parse_function_declaration()
+            case TokenType.Return:
+                return this.parse_return_statement()
             default:
                 return this.parse_expression()
         }
@@ -56,6 +76,45 @@ export default class Parser {
         // 
         this.expect(TokenType.Semicolon, "Expected semicolon after variable declaration")
         return declaration
+    }
+    private parse_function_declaration(): Statement {
+        this.eat() // eat "fn" keyword
+        if (this.get().type != TokenType.Identifier) toss("Expected Identifier token after function keyword", 101)
+        const declaration = {
+            type: "FunctionDeclaration",
+            name: { type: "Identifier", name: this.eat().value },
+            params: new Array<Identifier>(),
+            body: new Array<Statement>()
+        } as FunctionDeclaration
+
+        this.expect(TokenType.OpenParen, "Expected open parentheses in function declaration")
+
+        while (this.not_eof() && this.get().type == TokenType.Identifier) {
+            declaration.params.push({ type: "Identifier", name: this.eat().value })
+            if (this.get().type == TokenType.Comma) {
+                this.eat()
+                // eat the upcoming comma for mutliple arguments
+            }
+        }
+
+        this.expect(TokenType.CloseParen, "Expected closing parenthese after arguments")
+        this.expect(TokenType.OpenCurlyBrace, "Function code must be in code block")
+
+
+        while(this.not_eof() && this.get().type != TokenType.CloseCurlyBrace) {
+            declaration.body.push(this.parse_statment())
+        }
+
+        this.eat() // eat curly brace
+
+        return declaration
+    }
+    private parse_return_statement(): ReturnStatement {
+        this.eat() // eat the return keyword
+        return { 
+            type: "ReturnStatement",
+            value: this.parse_expression()
+        } as ReturnStatement
     }
 
 

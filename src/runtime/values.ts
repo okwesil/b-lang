@@ -1,6 +1,7 @@
+import { Identifier, Statement } from "../frontend/ast"
 import Environment from "./environment"
 
-export type ValueType = "null" | "number" | "string" | "boolean" | "object" | "native-function"
+export type ValueType = "null" | "number" | "string" | "boolean" | "object" | "native-function" | "ud-function"
 
 export interface RuntimeValue {
     type: ValueType
@@ -39,6 +40,13 @@ export interface ObjectValue extends RuntimeValue {
 export interface NativeFunctionValue extends RuntimeValue {
     type: "native-function"
     call: FunctionCall
+}
+
+export interface FunctionValue extends RuntimeValue {
+    type: "ud-function"
+    name: string
+    params: Identifier[],
+    body: Statement[],
 }
 
 export type FunctionCall = ( args: RuntimeValue[], env: Environment ) => RuntimeValue

@@ -1,7 +1,7 @@
 import { RuntimeValue, Create } from "./values";
-import { BinaryExp, NumberLiteral, Statement, Program, Identifier, VariableDeclaration, AssignmentExp, ObjectLiteral, CallExp, StringLiteral, MemberExp} from "../frontend/ast";
+import { BinaryExp, NumberLiteral, Statement, Program, Identifier, VariableDeclaration, AssignmentExp, ObjectLiteral, CallExp, StringLiteral, MemberExp, FunctionDeclaration, ReturnStatement} from "../frontend/ast";
 import Environment from "./environment";
-import { evaluateVariableDeclaration, evaluateProgram } from "./eval/statements";
+import { evaluateVariableDeclaration, evaluateProgram, evaluateFunctionDeclaration, evaluateReturnStatement } from "./eval/statements";
 import { evaluateAssignment, evaluateBinaryExpression, evaluateCallExpression, evaluateIdentifier, evaluateMemberExpression, evaluateObjectExpression } from "./eval/expressions";
 
 export function evaluate(astNode: Statement, env: Environment): RuntimeValue {
@@ -29,6 +29,10 @@ export function evaluate(astNode: Statement, env: Environment): RuntimeValue {
             return evaluateVariableDeclaration(astNode as VariableDeclaration, env)
         case "Program":
             return evaluateProgram(astNode as Program, env)
+        case "FunctionDeclaration":
+            return evaluateFunctionDeclaration(astNode as FunctionDeclaration, env)
+        case "ReturnStatement":
+            return evaluateReturnStatement(astNode as ReturnStatement, env)
         default:
             console.error("AST Node not setup: ")
             console.log(JSON.stringify(astNode, null, 2))
