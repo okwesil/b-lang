@@ -107,7 +107,6 @@ export function tokenize(sourceCode: string): Token[] {
             case "*":
             case "/":
             case "+":
-            case "-":
             case "%":
             case "^":
             case ">":
@@ -115,7 +114,34 @@ export function tokenize(sourceCode: string): Token[] {
                 tokens.push(tokenFrom(src.shift(), TokenType.BinaryOperator, location.line, location.col))
                 location.col++
                 continue
+            case "-":
+                // negative numbers
+                if (isint(src[1])) {
+                    src.shift()
+                    let num = "-" // start with negative sign
+                    while (src.length > 0 && isint(src[0])) {
+                        num += src.shift()
+                        location.col++
+                        // to get decimals
+                        if (src[0] == "." as string && isint(src[1])) {
+                            num += src.shift()
+                            num += src.shift()
+                            location.col += 2
+                        }
+                    }
+                    tokens.push(tokenFrom(num, TokenType.Number, location.line, location.col))
+                    continue
+                }
+                location.col++
+                tokens.push(tokenFrom(src.shift(), TokenType.BinaryOperator, location.line, location.col))
+                continue
             case "=":
+                if (src[1] == "=") {
+                    src.shift()
+                    src.shift()
+                    tokens.push(tokenFrom("==", TokenType.Equals, location.line, location.col))
+                    continue
+                }
                 tokens.push(tokenFrom(src.shift(), TokenType.Equals, location.line, location.col))
                 location.col++
                 continue
@@ -145,7 +171,7 @@ export function tokenize(sourceCode: string): Token[] {
                 num += src.shift()
                 location.col++
                 // to get decimals
-                if (src[1] == "." && isint(src[2])) {
+                if (src[0] === "." && isint(src[1])) {
                     num += src.shift()
                     num += src.shift()
                     location.col += 2
@@ -191,7 +217,7 @@ export function tokenize(sourceCode: string): Token[] {
 
 
     return tokens
-} 
+}
 
 
 function tokenFrom(value: string = "", type: TokenType, line: number, col: number): Token {

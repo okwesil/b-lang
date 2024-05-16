@@ -52,7 +52,7 @@ export interface FunctionValue extends RuntimeValue {
 export type FunctionCall = ( args: RuntimeValue[], env: Environment ) => RuntimeValue
 
 export class Create {
-    static auto(value: number | string | boolean ): NumberValue | StringValue | BooleanValue {
+    static auto(value: number | string | boolean | Function | null ): RuntimeValue {
         switch(typeof value) {
             case "string":
                 return Create.string(value)
@@ -60,6 +60,10 @@ export class Create {
                 return Create.number(value)
             case "boolean":
                 return Create.bool(value)
+            case "function":
+                return Create.nativeFn(value as FunctionCall)
+            case "object": // TODO: change this to be more definite
+                return Create.null()
         }
     }
     static number(value: number): NumberValue {
@@ -67,6 +71,16 @@ export class Create {
     }
     static string(value: string): StringValue {
         return { type: "string", value }
+    }
+    static object(value: Record<string, number | string | boolean | null | FunctionCall>): ObjectValue {
+        let obj = {
+            type: "object",
+            properties: new Map()
+        } as ObjectValue
+        for (const key in value) {
+            obj.properties.set(key, Create.auto(value[key]))
+        }
+        return obj
     }
     static null(): NullValue {
         return { type: "null", value: "null" }

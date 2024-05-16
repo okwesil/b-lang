@@ -46,6 +46,10 @@ function solve(operator: Operator, left: number, right: number): number | boolea
             return left < right
         case ">":
             return left > right
+        case "==":
+            return left == right
+        case "!=":
+            return left != right
     }
 }
 

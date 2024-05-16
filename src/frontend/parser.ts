@@ -167,7 +167,7 @@ export default class Parser {
         // while there is still an operator
         while
         (
-            this.get().value == ">" || this.get().value == "<" 
+            this.get().value == ">" || this.get().value == "<" || this.get().value == "=="
         ) {
             const operator = this.eat().value
             const right = this.parse_additive_expression()
