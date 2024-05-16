@@ -13,13 +13,15 @@ import {
     MemberExp, 
     FunctionDeclaration, 
     ReturnStatement, 
-    WhileStatement
+    WhileStatement,
+    IfStatement
 } from "../frontend/ast";
 import Environment from "./environment";
 import { 
     evaluateVariableDeclaration, 
     evaluateProgram, evaluateFunctionDeclaration, 
-    evaluateReturnStatement, evaluateWhileStatment
+    evaluateReturnStatement, evaluateWhileStatment,
+    evaluateIfStatment
 } from "./eval/statements";
 import { 
     evaluateAssignment, 
@@ -61,6 +63,8 @@ export function evaluate(astNode: Statement, env: Environment): RuntimeValue {
             return evaluateReturnStatement(astNode as ReturnStatement, env)
         case "WhileStatement":
             return evaluateWhileStatment(astNode as WhileStatement, env)
+        case "IfStatement":
+            return evaluateIfStatment(astNode as IfStatement, env)
         default:
             console.error("AST Node not setup: ")
             console.log(JSON.stringify(astNode, null, 2))

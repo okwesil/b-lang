@@ -1,5 +1,5 @@
 import { Create, RuntimeValue, NullValue, FunctionValue, BooleanValue } from "../values"
-import {  VariableDeclaration, Program, FunctionDeclaration, ReturnStatement, WhileStatement  } from "../../frontend/ast"
+import {  VariableDeclaration, Program, FunctionDeclaration, ReturnStatement, WhileStatement, IfStatement  } from "../../frontend/ast"
 import { evaluate } from "../interpreter"
 import Environment from "../environment"
 
@@ -43,6 +43,15 @@ export function runFunction(fn: FunctionValue, parent: Environment, args: Runtim
 
 export function evaluateWhileStatment(statement: WhileStatement, env: Environment): NullValue {
     while ((evaluate(statement.condition, env) as BooleanValue).value == true) {
+        for (const stmt of statement.body) {
+            evaluate(stmt, env)
+        }
+    }
+    return Create.null()
+}
+
+export function evaluateIfStatment(statement: IfStatement, env: Environment): NullValue {
+    if ((evaluate(statement.condition, env) as BooleanValue).value == true) {
         for (const stmt of statement.body) {
             evaluate(stmt, env)
         }

@@ -18,6 +18,7 @@ export enum TokenType {
     Function,
     Return,
     While,
+    If,
 
     Equals,
     OpenParen, CloseParen,
@@ -37,7 +38,8 @@ const KEYWORDS: Record<string, TokenType> = {
     "const": TokenType.ConstantVar,
     "fn": TokenType.Function,
     "return": TokenType.Return,
-    "while": TokenType.While
+    "while": TokenType.While,
+    "if": TokenType.If
 }
 
 

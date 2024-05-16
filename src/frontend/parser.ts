@@ -14,7 +14,8 @@ import {
     ObjectLiteral, 
     CallExp, MemberExp,
     ReturnStatement,
-    WhileStatement, 
+    WhileStatement,
+    IfStatement, 
 } from "./ast"
 import { tokenize, Token, TokenType } from "./lexer"
 
@@ -37,6 +38,8 @@ export default class Parser {
                 return this.parse_return_statement()
             case TokenType.While:
                 return this.parse_while_statement()
+            case TokenType.If:
+                return this.parse_if_statement()
             default:
                 return this.parse_expression()
         }
@@ -137,6 +140,26 @@ export default class Parser {
 
         return statement
     }
+
+    private parse_if_statement(): IfStatement {
+        this.eat() // eat if keyword
+        const condition = this.parse_expression()
+        const statement = { 
+            type: "IfStatement",
+            condition,
+            body: new Array<Statement>()
+        } as IfStatement
+        this.expect(TokenType.OpenCurlyBrace, "Expected open curly brace in expression")
+        while (this.not_eof() && this.get().type != TokenType.CloseCurlyBrace) {
+            statement.body.push(this.parse_statement())
+        } 
+        
+        this.eat() // eat curly brace
+
+        return statement
+    }
+
+    
 
     /*
     
