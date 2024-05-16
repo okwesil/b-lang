@@ -3,7 +3,6 @@ import Parser from "./frontend/parser"
 import { evaluate } from "./runtime/interpreter"
 import readline from "readline/promises"
 // basically just a scope
-import {  NumberValue } from "./runtime/values"
 import { Program } from "./frontend/ast"
 import { readFileSync } from "fs"
 import { createGlobalScope } from "./runtime/environment"

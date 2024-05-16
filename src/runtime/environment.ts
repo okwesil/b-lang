@@ -1,5 +1,5 @@
 import { pow, print as _print, println } from "./natives-functions"
-import { Create, NumberValue, RuntimeValue, Variable } from "./values"
+import { Create, RuntimeValue, Variable } from "./values"
 
 export function createGlobalScope(): Environment {
     const env = new Environment(null)

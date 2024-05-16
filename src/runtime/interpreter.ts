@@ -1,8 +1,34 @@
 import { RuntimeValue, Create } from "./values";
-import { BinaryExp, NumberLiteral, Statement, Program, Identifier, VariableDeclaration, AssignmentExp, ObjectLiteral, CallExp, StringLiteral, MemberExp, FunctionDeclaration, ReturnStatement} from "../frontend/ast";
+import { 
+    BinaryExp, 
+    NumberLiteral, 
+    Statement, 
+    Program, 
+    Identifier, 
+    VariableDeclaration, 
+    AssignmentExp, 
+    ObjectLiteral, 
+    CallExp, 
+    StringLiteral, 
+    MemberExp, 
+    FunctionDeclaration, 
+    ReturnStatement, 
+    WhileStatement
+} from "../frontend/ast";
 import Environment from "./environment";
-import { evaluateVariableDeclaration, evaluateProgram, evaluateFunctionDeclaration, evaluateReturnStatement } from "./eval/statements";
-import { evaluateAssignment, evaluateBinaryExpression, evaluateCallExpression, evaluateIdentifier, evaluateMemberExpression, evaluateObjectExpression } from "./eval/expressions";
+import { 
+    evaluateVariableDeclaration, 
+    evaluateProgram, evaluateFunctionDeclaration, 
+    evaluateReturnStatement, evaluateWhileStatment
+} from "./eval/statements";
+import { 
+    evaluateAssignment, 
+    evaluateBinaryExpression, 
+    evaluateCallExpression, 
+    evaluateIdentifier, 
+    evaluateMemberExpression, 
+    evaluateObjectExpression 
+} from "./eval/expressions";
 
 export function evaluate(astNode: Statement, env: Environment): RuntimeValue {
     switch(astNode.type) {
@@ -33,6 +59,8 @@ export function evaluate(astNode: Statement, env: Environment): RuntimeValue {
             return evaluateFunctionDeclaration(astNode as FunctionDeclaration, env)
         case "ReturnStatement":
             return evaluateReturnStatement(astNode as ReturnStatement, env)
+        case "WhileStatement":
+            return evaluateWhileStatment(astNode as WhileStatement, env)
         default:
             console.error("AST Node not setup: ")
             console.log(JSON.stringify(astNode, null, 2))

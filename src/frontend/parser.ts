@@ -13,7 +13,8 @@ import {
     Property, 
     ObjectLiteral, 
     CallExp, MemberExp,
-    ReturnStatement, 
+    ReturnStatement,
+    WhileStatement, 
 } from "./ast"
 import { tokenize, Token, TokenType } from "./lexer"
 
@@ -23,7 +24,7 @@ export default class Parser {
         // return whether first token isn't eof 
         return this.tokens[0].type != TokenType.EOF
     }    
-    private parse_statment(): Statement {
+    private parse_statement(): Statement {
         // in future when we have statements like function declarations
         // we can use this function to parse them so for now return expression
         switch(this.get().type) {
@@ -34,6 +35,8 @@ export default class Parser {
                 return this.parse_function_declaration()
             case TokenType.Return:
                 return this.parse_return_statement()
+            case TokenType.While:
+                return this.parse_while_statement()
             default:
                 return this.parse_expression()
         }
@@ -102,7 +105,7 @@ export default class Parser {
 
 
         while(this.not_eof() && this.get().type != TokenType.CloseCurlyBrace) {
-            declaration.body.push(this.parse_statment())
+            declaration.body.push(this.parse_statement())
         }
 
         this.eat() // eat curly brace
@@ -117,6 +120,23 @@ export default class Parser {
         } as ReturnStatement
     }
 
+    private parse_while_statement(): WhileStatement {
+        this.eat() // eat while keyword
+        const condition = this.parse_expression()
+        const statement = { 
+            type: "WhileStatement",
+            condition,
+            body: new Array<Statement>()
+        } as WhileStatement
+        this.expect(TokenType.OpenCurlyBrace, "Expected open curly brace in expression")
+        while (this.not_eof() && this.get().type != TokenType.CloseCurlyBrace) {
+            statement.body.push(this.parse_statement())
+        } 
+        
+        this.eat() // eat curly brace
+
+        return statement
+    }
 
     /*
     
@@ -170,7 +190,6 @@ export default class Parser {
             this.eat() // go past equal sign
             const value = this.parse_object_expression()
             const expression = { value, assignee: left, type: "AssignmentExp" } as AssignmentExp
-            this.expect(TokenType.Semicolon, "Expected semicolon after variable declaration")
             return expression
         }
 
@@ -454,7 +473,7 @@ export default class Parser {
 
         //parse until end of file token
         while(this.not_eof()) {
-            program.body.push(this.parse_statment())
+            program.body.push(this.parse_statement())
         }
         return program;
     }

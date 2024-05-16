@@ -1,7 +1,5 @@
-import { Expression } from "../frontend/ast";
-import Environment from "./environment";
 import { toss } from "./interpreter";
-import { Create, FunctionCall, NullValue, NumberValue, RuntimeValue } from "./values";
+import { Create, FunctionCall, NumberValue } from "./values";
 
 export const pow: FunctionCall = (args, env) => {
     if (args.length != 2) {

@@ -1,5 +1,5 @@
-import { Create, RuntimeValue, NullValue, FunctionValue, NumberValue, StringValue, BooleanValue } from "../values"
-import {  VariableDeclaration, Program, FunctionDeclaration, ReturnStatement  } from "../../frontend/ast"
+import { Create, RuntimeValue, NullValue, FunctionValue, BooleanValue } from "../values"
+import {  VariableDeclaration, Program, FunctionDeclaration, ReturnStatement, WhileStatement  } from "../../frontend/ast"
 import { evaluate } from "../interpreter"
 import Environment from "../environment"
 
@@ -39,4 +39,13 @@ export function runFunction(fn: FunctionValue, parent: Environment, args: Runtim
         evaluate(statement, localScope)
     }
     return returnValue ? returnValue : Create.null()
+}
+
+export function evaluateWhileStatment(statement: WhileStatement, env: Environment): NullValue {
+    while ((evaluate(statement.condition, env) as BooleanValue).value == true) {
+        for (const stmt of statement.body) {
+            evaluate(stmt, env)
+        }
+    }
+    return Create.null()
 }

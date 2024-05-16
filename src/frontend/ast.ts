@@ -1,4 +1,3 @@
-import { RuntimeValue } from "../runtime/values"
 
 export type NodeType = 
     // statements
@@ -6,6 +5,7 @@ export type NodeType =
     | "VariableDeclaration"
     | "FunctionDeclaration"
     | "ReturnStatement"
+    | "WhileStatement"
     // expressions
     | "NumberLiteral" 
     | "StringLiteral"
@@ -45,9 +45,15 @@ export interface FunctionDeclaration extends Statement {
 
 export interface ReturnStatement extends Statement {
     type: "ReturnStatement"
-    value: Expression,
+    value: Expression
 }
 
+export interface WhileStatement extends Statement {
+    type: "WhileStatement"
+    condition: Expression
+    body: Statement[]
+}
+ 
 /*
     normal format:
         x = {} 
@@ -69,36 +75,36 @@ export interface AssignmentExp extends Expression {
 // no distinction yet because we have no statements
 export interface Expression extends Statement {}
 export interface BinaryExp extends Expression {
-    type: "BinaryExp",
-    left: Expression,
-    right: Expression,
+    type: "BinaryExp"
+    left: Expression
+    right: Expression
     operator: Operator
 }
 
 
 export interface Identifier extends Expression {
-    type: "Identifier",
+    type: "Identifier"
     name: string
 }
 
 export interface NumberLiteral extends Expression {
-    type: "NumberLiteral",
+    type: "NumberLiteral"
     value: number
 }
 
 export interface StringLiteral extends Expression {
-    type: "StringLiteral",
+    type: "StringLiteral"
     value: string
 }
 
 export interface ObjectLiteral extends Expression {
-    type: "ObjectLiteral",
+    type: "ObjectLiteral"
     properties: Property[] 
 }
 
 export interface Property extends Expression {
-    type: "Property",
-    key: string,
+    type: "Property"
+    key: string
     value?: Expression 
 }
 
@@ -108,15 +114,15 @@ export interface Program extends Statement {
 }
 
 export interface MemberExp extends Expression {
-    type: "MemberExp",
+    type: "MemberExp"
     object: Expression
     property: Expression
     computed: boolean
 }
 
 export interface CallExp extends Expression {
-    type: "CallExp",
-    args: Expression[],
+    type: "CallExp"
+    args: Expression[]
     caller: Expression
 }
 

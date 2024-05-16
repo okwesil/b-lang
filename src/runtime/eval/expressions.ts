@@ -11,7 +11,6 @@ export function evaluateBinaryExpression(binaryOp: BinaryExp, env: Environment):
     let right = evaluate(binaryOp.right, env) as NumberValue 
     const { operator } = binaryOp
 
-    console.log(binaryOp)
 
     // if any are not number then 
     if (left.type != "number" || right.type != "number") {
