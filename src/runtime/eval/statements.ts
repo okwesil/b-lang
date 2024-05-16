@@ -1,4 +1,4 @@
-import { Create, RuntimeValue, NullValue, FunctionValue } from "../values"
+import { Create, RuntimeValue, NullValue, FunctionValue, NumberValue, StringValue, BooleanValue } from "../values"
 import {  VariableDeclaration, Program, FunctionDeclaration, ReturnStatement  } from "../../frontend/ast"
 import { evaluate } from "../interpreter"
 import Environment from "../environment"
@@ -25,8 +25,11 @@ export function evaluateReturnStatement(statement: ReturnStatement, env: Environ
     return evaluate(statement.value, env)
 }
 
-export function runFunction(fn: FunctionValue, parent: Environment): RuntimeValue {
+export function runFunction(fn: FunctionValue, parent: Environment, args: RuntimeValue[]): RuntimeValue {
     let localScope = new Environment(parent)
+    for (let i = 0; i < fn.params.length; i++) {
+        localScope.declareVariable(fn.params[i].name, args[i], false)
+    }
     let returnValue
     for (const statement of fn.body) {
         if (statement.type == "ReturnStatement") {

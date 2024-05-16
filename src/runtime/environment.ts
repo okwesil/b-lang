@@ -25,7 +25,6 @@ export default class Environment {
     constructor(parent: Environment | null) {
         this.parent = parent
         this.variables = new Map()
-
     }
 
     public declareVariable(varname: string, value: RuntimeValue, constant: boolean): void {

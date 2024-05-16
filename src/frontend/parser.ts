@@ -123,7 +123,8 @@ export default class Parser {
     Orders Of Precedence
     ( Order of Evaluation )
 
-    AssignmentExpr - bottom 
+    Boolean - bottom
+    AssignmentExpr  
     Object
     AdditiveExpr
     Multiplicative
@@ -138,6 +139,28 @@ export default class Parser {
 
     private parse_expression(): Expression {
         return this.parse_assignment_expression()
+    }
+
+    private parse_boolean_expression(): Expression {
+        let left = this.parse_additive_expression()
+
+        // while there is still an operator
+        while
+        (
+            this.get().value == ">" || this.get().value == "<" 
+        ) {
+            const operator = this.eat().value
+            const right = this.parse_additive_expression()
+            left = {
+                type: "BinaryExp",
+                left,
+                right,
+                operator
+            } as BinaryExp
+
+        }
+
+        return left
     }
 
 
@@ -158,7 +181,7 @@ export default class Parser {
         // expectation 1: { Property[] }
 
         if (this.get().type != TokenType.OpenCurlyBrace) {
-            return this.parse_additive_expression()
+            return this.parse_boolean_expression()
         }
 
         this.eat() // eat open curly brace
@@ -268,6 +291,9 @@ export default class Parser {
 
         return left
     }
+
+    
+
 
     // if object member is a function
     private parse_call_member_expression(): Expression {

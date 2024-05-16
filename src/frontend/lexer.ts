@@ -12,13 +12,14 @@ export enum TokenType {
     Number,
     String,
     Identifier,
-    
-    Equals,
+    // reserved
     MutableVar,
     ConstantVar,
     Function,
     Return,
+    While,
 
+    Equals,
     OpenParen, CloseParen,
     OpenCurlyBrace, CloseCurlyBrace,
     OpenBracket, CloseBracket,
@@ -35,7 +36,8 @@ const KEYWORDS: Record<string, TokenType> = {
     "let": TokenType.MutableVar,
     "const": TokenType.ConstantVar,
     "fn": TokenType.Function,
-    "return": TokenType.Return
+    "return": TokenType.Return,
+    "while": TokenType.While
 }
 
 
@@ -108,6 +110,8 @@ export function tokenize(sourceCode: string): Token[] {
             case "-":
             case "%":
             case "^":
+            case ">":
+            case "<":
                 tokens.push(tokenFrom(src.shift(), TokenType.BinaryOperator, location.line, location.col))
                 location.col++
                 continue

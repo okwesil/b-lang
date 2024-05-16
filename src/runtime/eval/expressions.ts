@@ -11,12 +11,14 @@ export function evaluateBinaryExpression(binaryOp: BinaryExp, env: Environment):
     let right = evaluate(binaryOp.right, env) as NumberValue 
     const { operator } = binaryOp
 
+    console.log(binaryOp)
+
     // if any are not number then 
     if (left.type != "number" || right.type != "number") {
         return Create.null()
     }
 
-    return Create.number(solve(operator, left.value, right.value))
+    return Create.auto(solve(operator, left.value, right.value))
 }
 
  
@@ -27,7 +29,7 @@ export function evaluateIdentifier(ident: Identifier, env: Environment): Runtime
 }
 
 
-function solve(operator: Operator, left: number, right: number): number {
+function solve(operator: Operator, left: number, right: number): number | boolean {
     switch(operator) {
         case "+":
             return left + right
@@ -40,7 +42,11 @@ function solve(operator: Operator, left: number, right: number): number {
         case "%":
             return left % right   
         case "^":
-            return left ** right   
+            return left ** right
+        case "<":
+            return left < right
+        case ">":
+            return left > right
     }
 }
 
@@ -91,7 +97,7 @@ export function evaluateCallExpression(expression: CallExp, env: Environment): R
     const fn = evaluate(expression.caller, env)
 
     if (fn.type != "native-function") {
-        return runFunction((fn as FunctionValue), env)
+        return runFunction((fn as FunctionValue), env, args)
     }
 
     let result = (fn as NativeFunctionValue).call(args, env)

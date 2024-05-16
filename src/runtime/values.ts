@@ -52,6 +52,16 @@ export interface FunctionValue extends RuntimeValue {
 export type FunctionCall = ( args: RuntimeValue[], env: Environment ) => RuntimeValue
 
 export class Create {
+    static auto(value: number | string | boolean ): NumberValue | StringValue | BooleanValue {
+        switch(typeof value) {
+            case "string":
+                return Create.string(value)
+            case "number":
+                return Create.number(value)
+            case "boolean":
+                return Create.bool(value)
+        }
+    }
     static number(value: number): NumberValue {
         return { type: "number", value }
     }
