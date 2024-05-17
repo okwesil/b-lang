@@ -1,5 +1,5 @@
-import { Create, RuntimeValue, NullValue, FunctionValue, BooleanValue } from "../values"
-import {  VariableDeclaration, Program, FunctionDeclaration, ReturnStatement, WhileStatement, IfStatement  } from "../../frontend/ast"
+import { Create, RuntimeValue, NullValue, FunctionValue, BooleanValue, ReturnValue } from "../values"
+import {  VariableDeclaration, Program, FunctionDeclaration, ReturnStatement, WhileStatement, IfStatement, Expression  } from "../../frontend/ast"
 import { evaluate } from "../interpreter"
 import Environment from "../environment"
 
@@ -36,25 +36,53 @@ export function runFunction(fn: FunctionValue, parent: Environment, args: Runtim
             returnValue = evaluate(statement, localScope)
             break
         }
-        evaluate(statement, localScope)
+        let val = evaluate(statement, localScope)
+        if (val.type == "return-value") {
+            returnValue = (val as ReturnValue).value
+            break
+        }
     }
     return returnValue ? returnValue : Create.null()
 }
 
-export function evaluateWhileStatment(statement: WhileStatement, env: Environment): NullValue {
-    while ((evaluate(statement.condition, env) as BooleanValue).value == true) {
+export function evaluateWhileStatment(statement: WhileStatement, env: Environment): RuntimeValue {
+    let returnValue: ReturnValue = {
+        type: "return-value",
+        value: undefined
+    }
+    conditionLoop: while ((evaluate(statement.condition, env) as BooleanValue).value == true) {
         for (const stmt of statement.body) {
-            evaluate(stmt, env)
+            if (stmt.type == "ReturnStatement") {
+                returnValue.value = evaluate((stmt as ReturnStatement).value, env)
+                break conditionLoop
+            }
+            let val = evaluate(stmt, env)
+            if (val.type == "return-value") {
+                returnValue.value = val
+                break conditionLoop
+            }
         }
     }
-    return Create.null()
+    return returnValue.value ? returnValue.value : Create.null()
 }
 
-export function evaluateIfStatment(statement: IfStatement, env: Environment): NullValue {
+export function evaluateIfStatment(statement: IfStatement, env: Environment): ReturnValue | NullValue  {
+    let returnValue: ReturnValue = {
+        type: "return-value",
+        value: undefined
+    }
     if ((evaluate(statement.condition, env) as BooleanValue).value == true) {
         for (const stmt of statement.body) {
-            evaluate(stmt, env)
+            if (stmt.type == "ReturnStatement") {
+                returnValue.value = evaluate((stmt as ReturnStatement).value, env)
+                break
+            }
+            let val = evaluate(stmt, env)
+            if (val.type == "return-value") {
+                returnValue.value = val
+                break
+            }
         }
     }
-    return Create.null()
+    return returnValue.value ? returnValue : Create.null()
 }

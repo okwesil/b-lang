@@ -22,7 +22,7 @@ export const print: FunctionCall = (args, env) => {
 
 export const math: Record<string, FunctionCall> = {
     "pow": (args, env) => {
-        if (args.length != 2) {
+        if (args.length < 2) {
             toss("Math.pow: Must have 2 arguments")
         }
         if (args[0].type != "number" || args[1].type != "number") {
@@ -32,7 +32,7 @@ export const math: Record<string, FunctionCall> = {
         return Create.number(Math.pow((args[0] as NumberValue).value,  (args[1] as NumberValue).value))
     },
     "abs": (args, env) => {
-        if (args.length != 1) {
+        if (args.length < 1) {
             toss("Math.abs: Must have 2 arguments")
         }
         if (args[0].type != "number") {
@@ -48,8 +48,14 @@ export const math: Record<string, FunctionCall> = {
     },
     "min": (args, env) => {
         if (args.some(arg => arg.type != "number")) {
-            toss("Math.min: all argument must be numbers")
+            toss("Math.min: all arguments must be numbers")
         }
         return Create.number(Math.min(...args.map(arg => (arg as NumberValue).value)))
+    },
+    "floor": (args, env) => {
+        if (args.some(arg => arg.type != "number")) {
+            toss("Math.round: argument must be a number")
+        }
+        return Create.number(Math.floor((args[0] as NumberValue).value))
     }
 }

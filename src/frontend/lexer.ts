@@ -25,6 +25,7 @@ export enum TokenType {
     OpenCurlyBrace, CloseCurlyBrace,
     OpenBracket, CloseBracket,
     BinaryOperator,
+    UnaryOperator,
     Semicolon,
     Colon,
     Comma,
@@ -82,6 +83,17 @@ export function tokenize(sourceCode: string): Token[] {
 
         // one character tokens
         switch(src[0]) {
+            case "!":
+                if (src[1] == "=") {
+                    src.shift()
+                    src.shift()
+                    location.col += 2
+                    tokens.push(tokenFrom("!=", TokenType.BinaryOperator, location.line, location.col))
+                    continue
+                }
+                location.col++
+                tokens.push(tokenFrom("!", TokenType.UnaryOperator, location.line, location.col))
+                continue
             case "(":
                 tokens.push(tokenFrom(src.shift(), TokenType.OpenParen, location.line, location.col))
                 location.col++
