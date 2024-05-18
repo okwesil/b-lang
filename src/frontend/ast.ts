@@ -20,7 +20,7 @@ export type NodeType =
     | "CallExp"
 
 
-export type Operator = "+" | "-" | "*" | "/" | "%" | "^" | ">" | "<" | "==" | "!="
+export type Operator = "+" | "-" | "*" | "/" | "%" | "^" | ">" | "<" | "<=" | ">=" | "==" | "!=" | "and" | "or"
 
 
 // statement doen't inherently return a value

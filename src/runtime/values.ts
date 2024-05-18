@@ -73,7 +73,10 @@ export class Create {
             case "function":
                 return Create.nativeFn(value as FunctionCall)
             case "object": // TODO: change this to be more definite
-                return Create.null()
+                if (value == null) {
+                    return Create.null()
+                }
+                return Create.object(value)
         }
     }
     static number(value: number): NumberValue {

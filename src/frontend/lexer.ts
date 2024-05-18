@@ -21,6 +21,7 @@ export enum TokenType {
     If,
 
     Equals,
+    And, Or, Not,
     OpenParen, CloseParen,
     OpenCurlyBrace, CloseCurlyBrace,
     OpenBracket, CloseBracket,
@@ -40,7 +41,10 @@ const KEYWORDS: Record<string, TokenType> = {
     "fn": TokenType.Function,
     "return": TokenType.Return,
     "while": TokenType.While,
-    "if": TokenType.If
+    "if": TokenType.If,
+    "or": TokenType.Or,
+    "and": TokenType.And,
+    "not": TokenType.Not
 }
 
 
@@ -123,10 +127,19 @@ export function tokenize(sourceCode: string): Token[] {
             case "+":
             case "%":
             case "^":
-            case ">":
-            case "<":
                 tokens.push(tokenFrom(src.shift(), TokenType.BinaryOperator, location.line, location.col))
                 location.col++
+                continue
+            case ">":
+            case "<":
+                if (src[1] == "=") {
+                    let sign = src.shift()
+                    src.shift()
+                    location.col += 2
+                    tokens.push(tokenFrom(sign + "=", TokenType.BinaryOperator, location.line, location.col))
+                }
+                location.col++
+                tokens.push(tokenFrom(src.shift(), TokenType.BinaryOperator, location.line, location.col))
                 continue
             case "-":
                 // negative numbers

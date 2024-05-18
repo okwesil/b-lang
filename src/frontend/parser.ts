@@ -171,11 +171,16 @@ export default class Parser {
     AssignmentExpr  
     Object
     Array ?
+    Logical OR     ||
+    Logical AND     && 
+    Equality     == != 
+    Relational   <  > <= >=
     AdditiveExpr
     Multiplicative
     Exponential
     FunctionCall
     MemberExpr
+    Unary
     PrimaryExpr   - top
 
     */
@@ -186,13 +191,35 @@ export default class Parser {
         return this.parse_assignment_expression()
     }
 
-    private parse_boolean_expression(): Expression {
+    private parse_equality_expression(): Expression {
+        let left = this.parse_relational_expression()
+
+        // while there is still an operator
+        while
+        (
+            this.get().value == "!=" || this.get().value == "==" 
+        ) {
+            const operator = this.eat().value
+            const right = this.parse_relational_expression()
+            left = {
+                type: "BinaryExp",
+                left,
+                right,
+                operator
+            } as BinaryExp
+
+        }
+
+        return left
+    }
+    
+    private parse_relational_expression(): Expression {
         let left = this.parse_additive_expression()
 
         // while there is still an operator
         while
         (
-            this.get().value == ">" || this.get().value == "<" || this.get().value == "==" || this.get().value == "!="
+            this.get().value == ">" || this.get().value == "<" || this.get().value == "<=" || this.get().value == ">="
         ) {
             const operator = this.eat().value
             const right = this.parse_additive_expression()
@@ -208,7 +235,50 @@ export default class Parser {
         return left
     }
 
+    private parse_logical_and_expression(): Expression {
+        let left = this.parse_equality_expression()
 
+        // while there is still an operator
+        while
+        (
+            this.get().type == TokenType.And
+        ) {
+            const operator = this.eat().value
+            const right = this.parse_equality_expression()
+            left = {
+                type: "BinaryExp",
+                left,
+                right,
+                operator
+            } as BinaryExp
+
+        }
+
+        return left
+    }
+
+    private parse_logical_or_expression(): Expression {
+        let left = this.parse_logical_and_expression()
+
+        // while there is still an operator
+        while
+        (
+            this.get().type == TokenType.Or
+        ) {
+            const operator = this.eat().value
+            const right = this.parse_logical_and_expression()
+            left = {
+                type: "BinaryExp",
+                left,
+                right,
+                operator
+            } as BinaryExp
+
+        }
+
+        return left
+    }
+    
     private parse_assignment_expression(): Expression {
         const left = this.parse_object_expression() 
         if (this.get().type == TokenType.Equals) {
@@ -272,7 +342,7 @@ export default class Parser {
 
     private parse_array_expression(): Expression {
         if (this.get().type != TokenType.OpenBracket) {
-            return this.parse_boolean_expression()
+            return this.parse_logical_or_expression()
         }
 
         

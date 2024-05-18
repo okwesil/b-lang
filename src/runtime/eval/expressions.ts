@@ -12,11 +12,9 @@ export function evaluateBinaryExpression(binaryOp: BinaryExp, env: Environment):
     const { operator } = binaryOp
 
 
-    // if any are not number then 
-    if (left.type != "number" || right.type != "number") {
+    if (left.type != right.type) {
         return Create.null()
     }
-
     return Create.auto(solve(operator, left.value, right.value))
 }
 
@@ -28,7 +26,7 @@ export function evaluateIdentifier(ident: Identifier, env: Environment): Runtime
 }
 
 
-function solve(operator: Operator, left: number, right: number): number | boolean {
+function solve(operator: Operator, left: any, right: any): number | string | boolean {
     switch(operator) {
         case "+":
             return left + right
@@ -50,6 +48,14 @@ function solve(operator: Operator, left: number, right: number): number | boolea
             return left == right
         case "!=":
             return left != right
+        case "<=":
+            return left <= right
+        case ">=":
+            return left >= right
+        case "and":
+            return left && right
+        case "or":
+            return left || right
     }
 }
 
