@@ -15,6 +15,7 @@ export type NodeType =
     | "AssignmentExp"
     | "Property"
     | "ObjectLiteral"
+    | "ArrayLiteral"
     | "MemberExp"
     | "CallExp"
 
@@ -107,6 +108,11 @@ export interface StringLiteral extends Expression {
 export interface ObjectLiteral extends Expression {
     type: "ObjectLiteral"
     properties: Property[] 
+}
+
+export interface ArrayLiteral extends Expression {
+    type: "ArrayLiteral"
+    elements: Expression[]
 }
 
 export interface Property extends Expression {

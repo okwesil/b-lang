@@ -1,5 +1,5 @@
 import { Create, RuntimeValue, NullValue, FunctionValue, BooleanValue, ReturnValue } from "../values"
-import {  VariableDeclaration, Program, FunctionDeclaration, ReturnStatement, WhileStatement, IfStatement, Expression  } from "../../frontend/ast"
+import {  VariableDeclaration, Program, FunctionDeclaration, ReturnStatement, WhileStatement, IfStatement  } from "../../frontend/ast"
 import { evaluate } from "../interpreter"
 import Environment from "../environment"
 

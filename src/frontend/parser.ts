@@ -15,7 +15,8 @@ import {
     CallExp, MemberExp,
     ReturnStatement,
     WhileStatement,
-    IfStatement, 
+    IfStatement,
+    ArrayLiteral, 
 } from "./ast"
 import { tokenize, Token, TokenType } from "./lexer"
 
@@ -169,6 +170,7 @@ export default class Parser {
     Boolean - bottom
     AssignmentExpr  
     Object
+    Array ?
     AdditiveExpr
     Multiplicative
     Exponential
@@ -223,7 +225,7 @@ export default class Parser {
         // expectation 1: { Property[] }
 
         if (this.get().type != TokenType.OpenCurlyBrace) {
-            return this.parse_boolean_expression()
+            return this.parse_array_expression()
         }
 
         this.eat() // eat open curly brace
@@ -268,6 +270,22 @@ export default class Parser {
         return { properties, type: "ObjectLiteral" } as ObjectLiteral
     }
 
+    private parse_array_expression(): Expression {
+        if (this.get().type != TokenType.OpenBracket) {
+            return this.parse_boolean_expression()
+        }
+
+        
+        this.eat() // eat opening bracket
+        let elements: Expression[] = [this.parse_expression()]
+
+        while (this.not_eof() && this.get().type != TokenType.CloseBracket) {
+            this.expect(TokenType.Comma, "Expected comma after array element")
+            elements.push(this.parse_expression())
+        }
+        this.expect(TokenType.CloseBracket, "Expected closing bracket")
+        return { type: "ArrayLiteral", elements } as ArrayLiteral
+    }
 
     // 10 + 5 - 5, treated as 
     // (10 + 5) - 5

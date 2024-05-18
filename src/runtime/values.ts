@@ -1,7 +1,7 @@
 import { Identifier, Statement } from "../frontend/ast"
 import Environment from "./environment"
 
-export type ValueType = "null" | "number" | "string" | "boolean" | "object" | "native-function" | "ud-function" | "return-value"
+export type ValueType = "null" | "number" | "string" | "boolean" | "object" | "native-function" | "ud-function" | "return-value" | "array"
 
 export interface RuntimeValue {
     type: ValueType
@@ -35,6 +35,11 @@ export interface Variable {
 export interface ObjectValue extends RuntimeValue {
     type: "object"
     properties: Map<string, RuntimeValue>
+}
+
+export interface ArrayValue extends RuntimeValue {
+    type: "array"
+    elements: RuntimeValue[]
 }
 
 export interface NativeFunctionValue extends RuntimeValue {

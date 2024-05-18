@@ -1,6 +1,6 @@
 import { evaluate, toss } from "../interpreter"
-import { Create, RuntimeValue, NumberValue, ObjectValue, NativeFunctionValue, StringValue, FunctionValue } from "../values"
-import { AssignmentExp, BinaryExp, CallExp, Identifier, MemberExp, ObjectLiteral, Operator } from "../../frontend/ast"
+import { Create, RuntimeValue, NumberValue, ObjectValue, NativeFunctionValue, StringValue, FunctionValue, ArrayValue } from "../values"
+import { ArrayLiteral, AssignmentExp, BinaryExp, CallExp, Identifier, MemberExp, ObjectLiteral, Operator } from "../../frontend/ast"
 import Environment from "../environment"
 import { runFunction } from "./statements"
 
@@ -61,7 +61,7 @@ export function evaluateAssignment(assignment: AssignmentExp, env: Environment):
     return env.assignVariable((assignment.assignee as Identifier).name, evaluate(assignment.value, env))
 }
 
-export function evaluateObjectExpression(literal: ObjectLiteral, env: Environment): RuntimeValue {
+export function evaluateObjectExpression(literal: ObjectLiteral, env: Environment): ObjectValue {
     const object: ObjectValue = {
         type: "object",
         properties: new Map()
@@ -76,7 +76,7 @@ export function evaluateObjectExpression(literal: ObjectLiteral, env: Environmen
 
 export function evaluateMemberExpression(member: MemberExp, env: Environment): RuntimeValue {
     let object = evaluate(member.object, env) as ObjectValue
-    if  (object.type != "object") {
+    if  (object.type != "object" && object.type != "array") {
         toss("object in member expression must be an object") 
     } 
     if (!member.computed) {
@@ -88,11 +88,22 @@ export function evaluateMemberExpression(member: MemberExp, env: Environment): R
     }
     // if reached here that means member is computed
     // object["hoo"]
-    let value = evaluate(member.property, env) as StringValue
-    if (!object.properties.has(value.value)) {
-        toss("Object does not have property: " + value.value)
+    // also means object referring to could be an array
+    let value = evaluate(member.property, env) as StringValue | NumberValue
+    if (value.type == "string") {
+        if (!object.properties.has(value.value)) {
+            return Create.null()
+        }
+        return object.properties.get(value.value) as RuntimeValue
+    } 
+    if (value.type != "number") {
+        toss("Value in member expression must be number or string")
     }
-    return object.properties.get(value.value) as RuntimeValue
+    let array = object as unknown as ArrayValue
+    if (array.elements.at(value.value)) {
+        return array.elements.at(value.value) as RuntimeValue
+    }
+    return Create.null()
 }
 
 export function evaluateCallExpression(expression: CallExp, env: Environment): RuntimeValue {
@@ -106,4 +117,9 @@ export function evaluateCallExpression(expression: CallExp, env: Environment): R
     let result = (fn as NativeFunctionValue).call(args, env)
 
     return result
+}
+
+export function evaluateArrayExpression(array: ArrayLiteral, env: Environment): ArrayValue {
+    let elements = array.elements.map(element => evaluate(element, env))
+    return { type: "array", elements }
 }

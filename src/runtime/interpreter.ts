@@ -14,7 +14,8 @@ import {
     FunctionDeclaration, 
     ReturnStatement, 
     WhileStatement,
-    IfStatement
+    IfStatement,
+    ArrayLiteral
 } from "../frontend/ast";
 import Environment from "./environment";
 import { 
@@ -29,7 +30,8 @@ import {
     evaluateCallExpression, 
     evaluateIdentifier, 
     evaluateMemberExpression, 
-    evaluateObjectExpression 
+    evaluateObjectExpression, 
+    evaluateArrayExpression
 } from "./eval/expressions";
 
 export function evaluate(astNode: Statement, env: Environment): RuntimeValue {
@@ -51,6 +53,8 @@ export function evaluate(astNode: Statement, env: Environment): RuntimeValue {
             return evaluateCallExpression(astNode as CallExp, env)
         case "MemberExp":
             return evaluateMemberExpression(astNode as MemberExp, env)
+        case "ArrayLiteral":
+            return evaluateArrayExpression(astNode as ArrayLiteral, env)
 
         // statements 
         case "VariableDeclaration":
