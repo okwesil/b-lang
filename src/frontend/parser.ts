@@ -16,7 +16,8 @@ import {
     ReturnStatement,
     WhileStatement,
     IfStatement,
-    ArrayLiteral, 
+    ArrayLiteral,
+    UnaryExp, 
 } from "./ast"
 import { tokenize, Token, TokenType } from "./lexer"
 
@@ -191,6 +192,23 @@ export default class Parser {
         return this.parse_assignment_expression()
     }
 
+    private parse_unary_expression(): Expression {
+        if (this.get().type != TokenType.UnaryOperator) {
+            return this.parse_primary_expression()
+        }   
+
+        const operator = this.eat().value
+        const target = this.parse_expression()
+
+        return {
+            type: "UnaryExp",
+            operator,
+            target
+        } as UnaryExp
+        
+    }
+
+    
     private parse_equality_expression(): Expression {
         let left = this.parse_relational_expression()
 
@@ -490,7 +508,7 @@ export default class Parser {
     }
 
     private parse_member_expression(): Expression {
-        let object = this.parse_primary_expression()
+        let object = this.parse_unary_expression()
 
         while (this.get().type == TokenType.Dot || this.get().type == TokenType.OpenBracket) {
             const operator = this.eat() // . or [
@@ -501,7 +519,7 @@ export default class Parser {
             // foo.bar
             if (operator.type == TokenType.Dot) {
                 computed = false
-                property = this.parse_primary_expression() // should be identifier
+                property = this.parse_unary_expression() // should be identifier
                 if (property.type != "Identifier") {
                     throw new Error("Computed member expression value must be an identifier")
                 }

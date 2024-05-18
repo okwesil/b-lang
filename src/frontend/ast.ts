@@ -12,6 +12,7 @@ export type NodeType =
     | "StringLiteral"
     | "Identifier" 
     | "BinaryExp" 
+    | "UnaryExp"
     | "AssignmentExp"
     | "Property"
     | "ObjectLiteral"
@@ -21,6 +22,7 @@ export type NodeType =
 
 
 export type Operator = "+" | "-" | "*" | "/" | "%" | "^" | ">" | "<" | "<=" | ">=" | "==" | "!=" | "and" | "or"
+export type UnaryOperator = "-" | "not"
 
 
 // statement doen't inherently return a value
@@ -87,6 +89,11 @@ export interface BinaryExp extends Expression {
     left: Expression
     right: Expression
     operator: Operator
+}
+export interface UnaryExp extends Expression {
+    type: "UnaryExp"
+    operator: UnaryOperator
+    target: Expression
 }
 
 

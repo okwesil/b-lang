@@ -1,21 +1,42 @@
 import { evaluate, toss } from "../interpreter"
-import { Create, RuntimeValue, NumberValue, ObjectValue, NativeFunctionValue, StringValue, FunctionValue, ArrayValue } from "../values"
-import { ArrayLiteral, AssignmentExp, BinaryExp, CallExp, Identifier, MemberExp, ObjectLiteral, Operator } from "../../frontend/ast"
+import { Create, RuntimeValue, NumberValue, ObjectValue, NativeFunctionValue, StringValue, FunctionValue, ArrayValue, BooleanValue } from "../values"
+import { ArrayLiteral, AssignmentExp, BinaryExp, CallExp, Identifier, MemberExp, ObjectLiteral, Operator, UnaryExp, UnaryOperator } from "../../frontend/ast"
 import Environment from "../environment"
 import { runFunction } from "./statements"
 
 
-export function evaluateBinaryExpression(binaryOp: BinaryExp, env: Environment): RuntimeValue {
+export function evaluateBinaryExpression(binaryExp: BinaryExp, env: Environment): RuntimeValue {
     // if its a binary expression then recursively call
-    let left = evaluate(binaryOp.left, env) as NumberValue 
-    let right = evaluate(binaryOp.right, env) as NumberValue 
-    const { operator } = binaryOp
+    let left = evaluate(binaryExp.left, env) as NumberValue 
+    let right = evaluate(binaryExp.right, env) as NumberValue 
+    const { operator } = binaryExp
 
 
     if (left.type != right.type) {
         return Create.null()
     }
     return Create.auto(solve(operator, left.value, right.value))
+}
+
+export function evaluateUnaryExpression(unaryExp: UnaryExp, env: Environment) {
+    let operator = unaryExp.operator
+    let runtimeVal = evaluate(unaryExp.target, env)
+    return Create.auto(solveUnary(operator, runtimeVal as BooleanValue | NumberValue))
+}
+
+function solveUnary(operator: UnaryOperator, target: BooleanValue | NumberValue) {
+    switch(operator) {
+        case "not": 
+            if (target.type != "boolean") {
+                toss("Type Error: \"not\" keyword can only be used on boolean values")
+            }
+            return !target.value
+        case "-":
+            if (target.type != "number") {
+                toss("Type Error: Cannot negate " + target.type)
+            }
+            return -target.value 
+    }
 }
 
  

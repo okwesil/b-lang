@@ -1,6 +1,7 @@
 import { RuntimeValue, Create } from "./values";
 import { 
     BinaryExp, 
+    UnaryExp,
     NumberLiteral, 
     Statement, 
     Program, 
@@ -31,7 +32,8 @@ import {
     evaluateIdentifier, 
     evaluateMemberExpression, 
     evaluateObjectExpression, 
-    evaluateArrayExpression
+    evaluateArrayExpression,
+    evaluateUnaryExpression
 } from "./eval/expressions";
 
 export function evaluate(astNode: Statement, env: Environment): RuntimeValue {
@@ -47,6 +49,8 @@ export function evaluate(astNode: Statement, env: Environment): RuntimeValue {
             return evaluateObjectExpression(astNode as ObjectLiteral, env)
         case "BinaryExp":
             return evaluateBinaryExpression(astNode as BinaryExp, env)
+        case "UnaryExp":
+            return evaluateUnaryExpression(astNode as UnaryExp, env)
         case "AssignmentExp":
             return evaluateAssignment(astNode as AssignmentExp, env)
         case "CallExp":
