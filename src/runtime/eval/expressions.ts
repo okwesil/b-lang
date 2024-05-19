@@ -1,6 +1,6 @@
 import { evaluate, toss } from "../interpreter"
 import { Create, RuntimeValue, NumberValue, ObjectValue, NativeFunctionValue, StringValue, FunctionValue, ArrayValue, BooleanValue } from "../values"
-import { ArrayLiteral, AssignmentExp, BinaryExp, CallExp, Identifier, MemberExp, ObjectLiteral, Operator, UnaryExp, UnaryOperator } from "../../frontend/ast"
+import { ArrayLiteral, AssignmentExp, BinaryExp, CallExp, Identifier, MemberExp, ObjectLiteral, Operator, SpreadExp, UnaryExp, UnaryOperator } from "../../frontend/ast"
 import Environment from "../environment"
 import { runFunction } from "./statements"
 
@@ -82,9 +82,47 @@ function solve(operator: Operator, left: any, right: any): number | string | boo
 
 
 export function evaluateAssignment(assignment: AssignmentExp, env: Environment): RuntimeValue {
-    if (assignment.assignee.type != "Identifier") {
+    if (assignment.assignee.type != "Identifier" && assignment.assignee.type != "MemberExp") {
         throw new Error(`Invalid left-hand side assigment:\n ${JSON.stringify(assignment.assignee, null, 2)}`)
     }
+    if (assignment.assignee.type == "MemberExp") {
+        const memberExp = assignment.assignee as MemberExp
+        const object = evaluate(memberExp.object, env) as ObjectValue | ArrayValue
+
+        if (object.type == "array") {
+            if (!memberExp.computed) {
+                toss("Must provide index in brackets to access array value")
+            }
+
+            const index = evaluate(memberExp.property, env)
+            if (index.type != "number") {
+                toss("Index must be number")
+            }
+            
+            object.elements[(index as NumberValue).value] = evaluate(assignment.value, env)
+            return evaluate(assignment.value, env)
+        }
+
+        let key: string;
+        if (!memberExp.computed) {
+            key = (memberExp.property as Identifier).name
+        } else {
+            let val = (evaluate(memberExp.property, env) as StringValue)
+            if (val.type != "string") {
+                toss("Key must be of type string")
+            }
+            key = val.value
+        }
+
+        if (!object.properties.has(key)) {
+            return Create.null()
+        }
+
+        object.properties.set(key, evaluate(assignment.value, env))
+        return evaluate(assignment.value, env)
+        
+    }
+    
     return env.assignVariable((assignment.assignee as Identifier).name, evaluate(assignment.value, env))
 }
 
@@ -146,7 +184,16 @@ export function evaluateCallExpression(expression: CallExp, env: Environment): R
     return result
 }
 
-export function evaluateArrayExpression(array: ArrayLiteral, env: Environment): ArrayValue {
+export function evaluateArrayExpression(array: ArrayLiteral | SpreadExp, env: Environment): ArrayValue {
+    if (array.type == "SpreadExp") {
+        let val = evaluate(array.argument, env)
+        if (val.type != "array") {
+            toss("Cannot spread non-array")
+        }
+        return { type: "array", elements: (val as ArrayValue).elements.map(val => {
+            return {...val}
+        }) }
+    }
     let elements = array.elements.map(element => evaluate(element, env))
     return { type: "array", elements }
 }

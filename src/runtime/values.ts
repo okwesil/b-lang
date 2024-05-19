@@ -85,7 +85,17 @@ export class Create {
     static string(value: string): StringValue {
         return { type: "string", value }
     }
-    static object(value: Record<string, number | string | boolean | null | FunctionCall>): ObjectValue {
+    static array(arr: (string | number | boolean | FunctionCall | null)[]) {
+        let result: RuntimeValue[] = []
+        for (const value of arr ) {
+            result.push(Create.auto(value))
+        }
+        return { type: "array", elements: result } as ArrayValue
+    }
+    static object(value: Record<string, number | string | boolean | null | FunctionCall> | Array<number | string | boolean | null | FunctionCall>): ObjectValue | ArrayValue {
+        if (Array.isArray(value)) {
+            return Create.array(value)
+        }
         let obj = {
             type: "object",
             properties: new Map()

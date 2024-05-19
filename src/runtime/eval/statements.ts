@@ -45,18 +45,19 @@ export function runFunction(fn: FunctionValue, parent: Environment, args: Runtim
     return returnValue ? returnValue : Create.null()
 }
 
-export function evaluateWhileStatment(statement: WhileStatement, env: Environment): RuntimeValue {
+export function evaluateWhileStatment(statement: WhileStatement, parent: Environment): RuntimeValue {
     let returnValue: ReturnValue = {
         type: "return-value",
         value: undefined
     }
-    conditionLoop: while ((evaluate(statement.condition, env) as BooleanValue).value == true) {
+    conditionLoop: while ((evaluate(statement.condition, parent) as BooleanValue).value == true) {
+        const localScope = new Environment(parent)
         for (const stmt of statement.body) {
             if (stmt.type == "ReturnStatement") {
-                returnValue.value = evaluate((stmt as ReturnStatement).value, env)
+                returnValue.value = evaluate((stmt as ReturnStatement).value, localScope)
                 break conditionLoop
             }
-            let val = evaluate(stmt, env)
+            let val = evaluate(stmt, localScope)
             if (val.type == "return-value") {
                 returnValue.value = val
                 break conditionLoop

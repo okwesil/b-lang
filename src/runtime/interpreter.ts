@@ -58,6 +58,7 @@ export function evaluate(astNode: Statement, env: Environment): RuntimeValue {
         case "MemberExp":
             return evaluateMemberExpression(astNode as MemberExp, env)
         case "ArrayLiteral":
+        case "SpreadExp":
             return evaluateArrayExpression(astNode as ArrayLiteral, env)
 
         // statements 

@@ -1,4 +1,4 @@
-import { print as _print, println, math } from "./natives-functions"
+import { print as _print, println, math, len, inspect, copy } from "./native-functions"
 import { Create, RuntimeValue, Variable } from "./values"
 
 export function createGlobalScope(): Environment {
@@ -9,7 +9,10 @@ export function createGlobalScope(): Environment {
 
     // define a native function
     env.declareVariable("Math", Create.object(math), true)
+    env.declareVariable("len", Create.nativeFn(len), true)
+    env.declareVariable("copy", Create.nativeFn(copy), true)
     env.declareVariable("println", Create.nativeFn(println), true)
+    env.declareVariable("inspect", Create.nativeFn(inspect), true)
     env.declareVariable("print", Create.nativeFn(_print), true)
     env.declareVariable("date", Create.nativeFn((args, env) => Create.number(Date.now())), true)
 
@@ -40,6 +43,7 @@ export default class Environment {
         env.variables.set(varname, Create.var(value, env.lookup(varname).constant))
         return value
     }
+
     // finds variable in outer scopes
     public resolve(varname: string): Environment {
         //check current scope
@@ -51,7 +55,7 @@ export default class Environment {
         // throw error
         if (!this.parent) {
             process.exitCode = 105 
-            throw new Error("Variable doesn't exist in reachable scopes")
+            throw new Error(`Variable: ${varname} doesn't exist in reachable scopes`)
         }
         // call the parent's resolve to find the variable in that scope
         return this.parent.resolve(varname)

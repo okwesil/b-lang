@@ -17,7 +17,8 @@ import {
     WhileStatement,
     IfStatement,
     ArrayLiteral,
-    UnaryExp, 
+    UnaryExp,
+    SpreadExp, 
 } from "./ast"
 import { tokenize, Token, TokenType } from "./lexer"
 
@@ -171,7 +172,7 @@ export default class Parser {
     Boolean - bottom
     AssignmentExpr  
     Object
-    Array ?
+    Array
     Logical OR     ||
     Logical AND     && 
     Equality     == != 
@@ -359,10 +360,17 @@ export default class Parser {
     }
 
     private parse_array_expression(): Expression {
-        if (this.get().type != TokenType.OpenBracket) {
+        if (this.get().type != TokenType.OpenBracket && this.get().type != TokenType.Spread) {
             return this.parse_logical_or_expression()
         }
 
+        if (this.get().type == TokenType.Spread) {
+            this.eat() // eat spread token
+            return {
+                type: "SpreadExp",
+                argument: this.parse_expression()
+            } as SpreadExp
+        }
         
         this.eat() // eat opening bracket
         let elements: Expression[] = [this.parse_expression()]

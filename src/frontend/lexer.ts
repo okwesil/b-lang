@@ -21,7 +21,7 @@ export enum TokenType {
     If,
 
     Equals,
-    And, Or,
+    And, Or, Spread,
     OpenParen, CloseParen,
     OpenCurlyBrace, CloseCurlyBrace,
     OpenBracket, CloseBracket,
@@ -44,7 +44,8 @@ const KEYWORDS: Record<string, TokenType> = {
     "if": TokenType.If,
     "or": TokenType.Or,
     "and": TokenType.And,
-    "not": TokenType.UnaryOperator
+    "not": TokenType.UnaryOperator,
+    "fan": TokenType.Spread
 }
 
 
