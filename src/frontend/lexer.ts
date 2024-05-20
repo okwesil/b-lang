@@ -96,9 +96,6 @@ export function tokenize(sourceCode: string): Token[] {
                     tokens.push(tokenFrom("!=", TokenType.BinaryOperator, location.line, location.col))
                     continue
                 }
-                location.col++
-                tokens.push(tokenFrom("!", TokenType.UnaryOperator, location.line, location.col))
-                continue
             case "(":
                 tokens.push(tokenFrom(src.shift(), TokenType.OpenParen, location.line, location.col))
                 location.col++
@@ -128,6 +125,14 @@ export function tokenize(sourceCode: string): Token[] {
             case "+":
             case "%":
             case "^":
+                if (src[1] == "=") {
+                    let operator = src.shift() as string
+                    src.shift() // get rid of =
+                    location.col++
+                    tokens.push(tokenFrom(operator + "=", TokenType.Equals, location.line, location.col))
+                    continue
+                }
+                
                 tokens.push(tokenFrom(src.shift(), TokenType.BinaryOperator, location.line, location.col))
                 location.col++
                 continue
@@ -164,6 +169,13 @@ export function tokenize(sourceCode: string): Token[] {
                 if (isalpha(src[1]) || src[1] == "(") {
                     location.col++
                     tokens.push(tokenFrom(src.shift(), TokenType.UnaryOperator, location.line, location.col))
+                    continue
+                }
+                if (src[1] == "=") {
+                    src.shift()
+                    src.shift()
+                    location.col++
+                    tokens.push(tokenFrom("-=", TokenType.Equals, location.line, location.col))
                     continue
                 }
                 location.col++

@@ -24,6 +24,7 @@ export type NodeType =
 
 export type Operator = "+" | "-" | "*" | "/" | "%" | "^" | ">" | "<" | "<=" | ">=" | "==" | "!=" | "and" | "or"
 export type UnaryOperator = "-" | "not"
+export type AssignmentOperator = "=" | "+=" | "-=" | "*=" | "/=" | "%=" | "^="
 
 
 // statement doen't inherently return a value
@@ -79,6 +80,7 @@ export interface AssignmentExp extends Expression {
     type: "AssignmentExp"
     assignee: Expression
     value: Expression
+    operator:  AssignmentOperator
 }
 
 

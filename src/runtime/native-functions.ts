@@ -3,7 +3,7 @@ import { toss } from "./interpreter";
 import { ArrayValue, BooleanValue, Create, FunctionCall, NumberValue, ObjectValue, ReturnValue, RuntimeValue, StringValue } from "./values";
 
 export const inspect: FunctionCall = (args, env) => {
-    console.log(JSON.stringify(args[0], null, 2))
+    console.log(...args)
     return Create.null()
 }
 
@@ -27,6 +27,7 @@ export const println: FunctionCall = (args, env) => {
     console.log(str)
     return Create.null()
 }
+
 
 function represent(val: RuntimeValue): string {
     switch(val.type) {

@@ -98,11 +98,54 @@ export function evaluateAssignment(assignment: AssignmentExp, env: Environment):
             if (index.type != "number") {
                 toss("Index must be number")
             }
-            
-            object.elements[(index as NumberValue).value] = evaluate(assignment.value, env)
-            return evaluate(assignment.value, env)
+            if (!object.elements[(index as NumberValue).value]) {
+                return Create.null()
+            }
+            switch(assignment.operator) {
+                 case "=":
+                    object.elements[(index as NumberValue).value] = evaluate(assignment.value, env)
+                    break
+                case "+=":
+                    if (object.elements[(index as NumberValue).value].type != "number" && object.elements[(index as NumberValue).value].type != "string") {
+                        toss("Can only perform addition on numbers and strings")
+                    }
+                    (object.elements[(index as NumberValue).value] as NumberValue | StringValue).value += (evaluate(assignment.value, env) as NumberValue | StringValue).value as any
+                    break
+                case "-=":
+                    if (object.elements[(index as NumberValue).value].type != "number") {
+                        toss(`Can only perform ${assignment.operator} on numbers`)
+                    }
+                    (object.elements[(index as NumberValue).value] as NumberValue).value -= (evaluate(assignment.value, env) as NumberValue).value
+                    break   
+                case "*=":
+                    if (object.elements[(index as NumberValue).value].type != "number") {
+                        toss(`Can only perform ${assignment.operator} on numbers`)
+                    }
+                    (object.elements[(index as NumberValue).value] as NumberValue).value *= (evaluate(assignment.value, env) as NumberValue).value
+                    break
+                case "/=":
+                    if (object.elements[(index as NumberValue).value].type != "number") {
+                        toss(`Can only perform ${assignment.operator} on numbers`)
+                    }
+                    (object.elements[(index as NumberValue).value] as NumberValue).value /= (evaluate(assignment.value, env) as NumberValue).value
+                    break
+                case "%=":
+                    if (object.elements[(index as NumberValue).value].type != "number") {
+                        toss(`Can only perform ${assignment.operator} on numbers`)
+                    }
+                    (object.elements[(index as NumberValue).value] as NumberValue).value %= (evaluate(assignment.value, env) as NumberValue).value
+                    break
+                case "^=":   
+                    if (object.elements[(index as NumberValue).value].type != "number") {
+                        toss(`Can only perform ${assignment.operator} on numbers`)
+                    }
+                    (object.elements[(index as NumberValue).value] as NumberValue).value **= (evaluate(assignment.value, env) as NumberValue).value
+                    break
+            }
+            return object.elements[(index as NumberValue).value]
         }
 
+        // if object
         let key: string;
         if (!memberExp.computed) {
             key = (memberExp.property as Identifier).name
@@ -118,12 +161,93 @@ export function evaluateAssignment(assignment: AssignmentExp, env: Environment):
             return Create.null()
         }
 
-        object.properties.set(key, evaluate(assignment.value, env))
-        return evaluate(assignment.value, env)
+        const prop = object.properties.get(key) as RuntimeValue
+        if (prop == undefined) {
+            toss("Property does not exist on object")
+        }
+        
+        switch(assignment.operator) {
+            case "=":
+                object.properties.set(key, evaluate(assignment.value, env))
+                break
+            case "+=":
+                //TODO: check if prop is equal to assignment value for a more detailed check
+                if (prop.type != "number" && prop.type != "string") {
+                    toss("Can only perform addition on numbers and strings")
+                }
+                (prop as NumberValue | StringValue).value += (evaluate(assignment.value, env) as NumberValue | StringValue).value as any
+                break
+            case "-=":
+                if (prop.type != "number") {
+                    toss(`Can only perform "${assignment.operator}" on numbers`)
+                }
+                (prop as NumberValue).value -= (evaluate(assignment.value, env) as NumberValue).value
+                break
+            case "*=":
+                if (prop.type != "number") {
+                    toss(`Can only perform "${assignment.operator}" on numbers`)
+                }
+                (prop as NumberValue).value *= (evaluate(assignment.value, env) as NumberValue).value
+                break
+            case "/=":
+                if (prop.type != "number") {
+                    toss(`Can only perform "${assignment.operator}" on numbers`)
+                }
+                (prop as NumberValue).value /= (evaluate(assignment.value, env) as NumberValue).value
+                break
+            case "%=":
+                if (prop.type != "number") {
+                    toss(`Can only perform "${assignment.operator}" on numbers`)
+                }
+                (prop as NumberValue).value %= (evaluate(assignment.value, env) as NumberValue).value
+                break
+            case "^=":
+                if (prop.type != "number") {
+                    toss(`Can only perform "${assignment.operator}" on numbers`)
+                }
+                (prop as NumberValue).value **= (evaluate(assignment.value, env) as NumberValue).value
+                break
+        }
+
+        return prop as RuntimeValue
         
     }
-    
-    return env.assignVariable((assignment.assignee as Identifier).name, evaluate(assignment.value, env))
+    const name: string = (assignment.assignee as Identifier).name
+    switch(assignment.operator) {
+            case "=":
+                return env.assignVariable(name, evaluate(assignment.value, env))
+            case "+=":
+                if (env.lookup(name).value.type != "number" && env.lookup(name).value.type != "string") {
+                    toss("Can only perform addition on numbers and strings")
+                }
+            return env.assignVariable(name, { type: env.lookup(name).value.type, value: (env.lookup(name).value as NumberValue).value + (evaluate(assignment.value, env) as NumberValue).value } as NumberValue | StringValue)
+            case "-=":
+                if (env.lookup(name).value.type != "number") {
+                    toss(`Can only perform ${assignment.operator} on numbers`)
+                }
+                return env.assignVariable(name, { type: "number", value: (env.lookup(name).value as NumberValue).value - (evaluate(assignment.value, env) as NumberValue).value } as NumberValue)
+            case "*=":
+                if (env.lookup(name).value.type != "number") {
+                    toss(`Can only perform ${assignment.operator} on numbers`)
+                }
+                return env.assignVariable(name, { type: "number", value: (env.lookup(name).value as NumberValue).value * (evaluate(assignment.value, env) as NumberValue).value } as NumberValue)
+            case "/=":
+                if (env.lookup(name).value.type != "number") {
+                    toss(`Can only perform ${assignment.operator} on numbers`)
+                }
+                return env.assignVariable(name, { type: "number", value: (env.lookup(name).value as NumberValue).value / (evaluate(assignment.value, env) as NumberValue).value } as NumberValue)
+            case "%=":
+                if (env.lookup(name).value.type != "number") {
+                    toss(`Can only perform ${assignment.operator} on numbers`)
+                }
+                return env.assignVariable(name, { type: "number", value: (env.lookup(name).value as NumberValue).value % (evaluate(assignment.value, env) as NumberValue).value } as NumberValue)
+            case "^=":
+                if (env.lookup(name).value.type != "number") {
+                    toss(`Can only perform ${assignment.operator} on numbers`)
+                }
+                return env.assignVariable(name, { type: "number", value: (env.lookup(name).value as NumberValue).value ** (evaluate(assignment.value, env) as NumberValue).value } as NumberValue)
+            
+    }
 }
 
 export function evaluateObjectExpression(literal: ObjectLiteral, env: Environment): ObjectValue {

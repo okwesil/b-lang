@@ -18,7 +18,8 @@ import {
     IfStatement,
     ArrayLiteral,
     UnaryExp,
-    SpreadExp, 
+    SpreadExp,
+    AssignmentOperator, 
 } from "./ast"
 import { tokenize, Token, TokenType } from "./lexer"
 
@@ -301,9 +302,9 @@ export default class Parser {
     private parse_assignment_expression(): Expression {
         const left = this.parse_object_expression() 
         if (this.get().type == TokenType.Equals) {
-            this.eat() // go past equal sign
+            let operator = this.eat().value // go past equal sign
             const value = this.parse_object_expression()
-            const expression = { value, assignee: left, type: "AssignmentExp" } as AssignmentExp
+            const expression = { value, assignee: left, type: "AssignmentExp", operator } as AssignmentExp
             return expression
         }
 
