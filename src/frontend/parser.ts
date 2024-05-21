@@ -19,7 +19,7 @@ import {
     ArrayLiteral,
     UnaryExp,
     SpreadExp,
-    AssignmentOperator, 
+    Type, 
 } from "./ast"
 import { tokenize, Token, TokenType } from "./lexer"
 
@@ -94,7 +94,8 @@ export default class Parser {
             type: "FunctionDeclaration",
             name: { type: "Identifier", name: this.eat().value },
             params: new Array<Identifier>(),
-            body: new Array<Statement>()
+            body: new Array<Statement>(),
+            returnType: "null"
         } as FunctionDeclaration
 
         this.expect(TokenType.OpenParen, "Expected open parentheses in function declaration")
@@ -108,7 +109,11 @@ export default class Parser {
         }
 
         this.expect(TokenType.CloseParen, "Expected closing parenthese after arguments")
-        this.expect(TokenType.OpenCurlyBrace, "Function code must be in code block")
+        if (this.get().type == TokenType.Colon) {
+            this.eat()
+            declaration.returnType = this.expect(TokenType.ValueType, "Expected return type after colon in function declaration").value as Type
+        }
+        this.expect(TokenType.OpenCurlyBrace, "Expected Open Curly Brace after function declaration")
 
 
         while(this.not_eof() && this.get().type != TokenType.CloseCurlyBrace) {
@@ -123,7 +128,7 @@ export default class Parser {
         this.eat() // eat the return keyword
         return { 
             type: "ReturnStatement",
-            value: this.parse_expression()
+            value: this.get().type != TokenType.CloseCurlyBrace ? this.parse_expression(): null
         } as ReturnStatement
     }
 
@@ -576,8 +581,8 @@ export default class Parser {
     * Returns the next token in the token stream without removing it.
     * @returns {Token} The next token in the token stream.
     */
-    private get(): Token {
-        return this.tokens[0]
+    private get(index: number = 0): Token {
+        return this.tokens[index]
     }
     /**
      * Consumes the next token from the token stream and returns it.
@@ -597,6 +602,7 @@ export default class Parser {
         const previous = this.eat()
         if (!previous || previous.type != desiredType) {
             console.error(err)
+            console.log("in -> " + JSON.stringify(previous, null, 2))
             process.exit()
         }
         return previous

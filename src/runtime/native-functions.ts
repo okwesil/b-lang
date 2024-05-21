@@ -1,13 +1,12 @@
-import Environment from "./environment";
 import { toss } from "./interpreter";
 import { ArrayValue, BooleanValue, Create, FunctionCall, NumberValue, ObjectValue, ReturnValue, RuntimeValue, StringValue } from "./values";
 
-export const inspect: FunctionCall = (args, env) => {
+export const inspect: FunctionCall = (args) => {
     console.log(...args)
     return Create.null()
 }
 
-export const copy: FunctionCall = (args, env) => {
+export const copy: FunctionCall = (args) => {
     if (args[0].type != "array") {
         toss("copy: Argument must be an array")
     }
@@ -19,7 +18,7 @@ export const copy: FunctionCall = (args, env) => {
     return { type: "array", elements } as ArrayValue
 }
 
-export const println: FunctionCall = (args, env) => {
+export const println: FunctionCall = (args) => {
     let str: string = ""
     for (const arg of args) {
         str += represent(arg) + " "
@@ -49,7 +48,7 @@ function represent(val: RuntimeValue): string {
             return "null"
         case "native-function":
             return "Native Function()"
-        case "ud-function":
+        case "function":
             return "Function()"
         case "return-value":
             return `Return Value: ${(val as ReturnValue).value}`
@@ -66,7 +65,7 @@ function represent(val: RuntimeValue): string {
     }
 }
 
-export const print: FunctionCall = (args, env) => {
+export const print: FunctionCall = (args) => {
     let str: string = ""
     for (const arg of args) {
         str += represent(arg) + " "
@@ -76,7 +75,7 @@ export const print: FunctionCall = (args, env) => {
     return Create.null()
 }
 
-export const len: FunctionCall = (args, env) => {
+export const len: FunctionCall = (args) => {
     let length;
     switch(args[0].type) {
         case "string":
@@ -91,7 +90,7 @@ export const len: FunctionCall = (args, env) => {
             toss("null does not have a length")
         case "native-function":
             toss("functions don't have a length")
-        case "ud-function":
+        case "function":
             toss("functions don't have a length")
         case "return-value":
             toss("Return values do not have a length")
@@ -100,6 +99,16 @@ export const len: FunctionCall = (args, env) => {
     }
     return Create.number(length)
 } 
+
+export const _number: FunctionCall = (args) => {
+    if (args[0].type != "string") {
+        toss("Can only convert string to number")
+    }
+    return Create.number(parseInt((args[0] as StringValue).value))
+}
+export const _string: FunctionCall = (args) => {
+    return Create.string((args[0] as StringValue | NumberValue | BooleanValue).value.toString())
+}
 
 export const math: Record<string, FunctionCall> = {
     "pow": (args, env) => {

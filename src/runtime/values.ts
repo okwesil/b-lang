@@ -1,7 +1,7 @@
-import { Identifier, Statement } from "../frontend/ast"
+import { Identifier, Statement, Type } from "../frontend/ast"
 import Environment from "./environment"
 
-export type ValueType = "null" | "number" | "string" | "boolean" | "object" | "native-function" | "ud-function" | "return-value" | "array"
+export type ValueType = "null" | "number" | "string" | "boolean" | "object" | "native-function" | "function" | "return-value" | "array"
 
 export interface RuntimeValue {
     type: ValueType
@@ -48,10 +48,11 @@ export interface NativeFunctionValue extends RuntimeValue {
 }
 
 export interface FunctionValue extends RuntimeValue {
-    type: "ud-function"
+    type: "function"
     name: string
     params: Identifier[],
     body: Statement[],
+    returnType: Type
 }
 
 export interface ReturnValue extends RuntimeValue {

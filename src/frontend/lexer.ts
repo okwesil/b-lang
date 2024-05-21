@@ -19,7 +19,9 @@ export enum TokenType {
     Return,
     While,
     If,
-
+    // types
+    ValueType,
+    
     Equals,
     And, Or, Spread,
     OpenParen, CloseParen,
@@ -45,7 +47,11 @@ const KEYWORDS: Record<string, TokenType> = {
     "or": TokenType.Or,
     "and": TokenType.And,
     "not": TokenType.UnaryOperator,
-    "fan": TokenType.Spread
+    "fan": TokenType.Spread,
+    "number": TokenType.ValueType,
+    "string": TokenType.ValueType,
+    "bool": TokenType.ValueType,
+    "array": TokenType.ValueType,
 }
 
 

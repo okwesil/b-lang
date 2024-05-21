@@ -25,7 +25,7 @@ export type NodeType =
 export type Operator = "+" | "-" | "*" | "/" | "%" | "^" | ">" | "<" | "<=" | ">=" | "==" | "!=" | "and" | "or"
 export type UnaryOperator = "-" | "not"
 export type AssignmentOperator = "=" | "+=" | "-=" | "*=" | "/=" | "%=" | "^="
-
+export type Type = "number" | "string" | "boolean" | "null" | "array" | "object"
 
 // statement doen't inherently return a value
 export interface Statement {
@@ -47,6 +47,7 @@ export interface FunctionDeclaration extends Statement {
     name: Identifier 
     params: Identifier[]
     body: Statement[]
+    returnType: Type
 }
 
 export interface ReturnStatement extends Statement {
@@ -98,7 +99,6 @@ export interface UnaryExp extends Expression {
     operator: UnaryOperator
     target: Expression
 }
-
 
 export interface Identifier extends Expression {
     type: "Identifier"
@@ -153,5 +153,3 @@ export interface CallExp extends Expression {
     args: Expression[]
     caller: Expression
 }
-
-

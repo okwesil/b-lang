@@ -1,6 +1,6 @@
 import { Create, RuntimeValue, NullValue, FunctionValue, BooleanValue, ReturnValue } from "../values"
 import {  VariableDeclaration, Program, FunctionDeclaration, ReturnStatement, WhileStatement, IfStatement  } from "../../frontend/ast"
-import { evaluate } from "../interpreter"
+import { evaluate, toss } from "../interpreter"
 import Environment from "../environment"
 
 export function evaluateVariableDeclaration(declaration: VariableDeclaration, env: Environment): NullValue {
@@ -17,7 +17,7 @@ export function evaluateProgram(program: Program, env: Environment): RuntimeValu
 }
 
 export function evaluateFunctionDeclaration(fn: FunctionDeclaration, env: Environment): RuntimeValue {
-    env.declareVariable(fn.name.name, { type: "ud-function", name: fn.name.name, body: fn.body, params: fn.params} as FunctionValue, true)
+    env.declareVariable(fn.name.name, { type: "function", name: fn.name.name, body: fn.body, params: fn.params, returnType: fn.returnType } as FunctionValue, true)
     return Create.null()
 }
 
@@ -33,11 +33,18 @@ export function runFunction(fn: FunctionValue, parent: Environment, args: Runtim
     let returnValue
     for (const statement of fn.body) {
         if (statement.type == "ReturnStatement") {
-            returnValue = evaluate(statement, localScope)
+            const val = evaluate(statement, localScope)
+            if (val.type != fn.returnType) {
+                toss(`Invalid return type for ${fn.name}. Expected ${fn.returnType} but got ${val.type}`)
+            }
+            returnValue = val
             break
         }
         let val = evaluate(statement, localScope)
         if (val.type == "return-value") {
+            if ((val as ReturnValue).value?.type != fn.returnType) {
+                toss(`Invalid return type for ${fn.name}. Expected ${fn.returnType} but got ${(val as ReturnValue).value?.type}`)
+            }
             returnValue = (val as ReturnValue).value
             break
         }

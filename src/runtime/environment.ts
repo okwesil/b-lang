@@ -1,4 +1,13 @@
-import { print as _print, println, math, len, inspect, copy } from "./native-functions"
+import { 
+    print as _print,
+    _string,
+    _number,
+    println, 
+    math, 
+    len, 
+    inspect, 
+    copy
+} from "./native-functions"
 import { Create, RuntimeValue, Variable } from "./values"
 
 export function createGlobalScope(): Environment {
@@ -14,13 +23,14 @@ export function createGlobalScope(): Environment {
     env.declareVariable("println", Create.nativeFn(println), true)
     env.declareVariable("inspect", Create.nativeFn(inspect), true)
     env.declareVariable("print", Create.nativeFn(_print), true)
+    env.declareVariable("String", Create.nativeFn(_string), true)
+    env.declareVariable("Number", Create.nativeFn(_number), true)
     env.declareVariable("date", Create.nativeFn((args, env) => Create.number(Date.now())), true)
 
     return env
 }
 
 export default class Environment {
-    
     private parent: Environment | null
     private variables: Map<string, Variable>
 
