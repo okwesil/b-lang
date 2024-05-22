@@ -19,7 +19,8 @@ import {
     ArrayLiteral,
     UnaryExp,
     SpreadExp,
-    Type, 
+    Type,
+    FunctionExp, 
 } from "./ast"
 import { tokenize, Token, TokenType } from "./lexer"
 
@@ -89,7 +90,41 @@ export default class Parser {
     }
     private parse_function_declaration(): Statement {
         this.eat() // eat "fn" keyword
-        if (this.get().type != TokenType.Identifier) toss("Expected Identifier token after function keyword", 101)
+
+        /* 
+            fn(arg, otherArg) => { Body } 
+            or 
+            fn(arg, otherArg) => arg + otherArg
+                    
+                    |
+            function expression 
+        */
+
+        if (this.get().type == TokenType.OpenParen) {
+            this.eat()
+            const params = this.parse_args()
+            let body: Statement[] = []
+            if (this.get().type == TokenType.OpenCurlyBrace) {
+                this.eat()
+                while(this.not_eof() && this.get().type != TokenType.CloseCurlyBrace) {
+                    body.push(this.parse_statement())
+                }
+                this.expect(TokenType.CloseCurlyBrace, "Expected closing curly brace after arrow function body")
+            } else if (this.get().type == TokenType.Arrow) {
+                this.eat()
+                body.push(this.parse_expression())
+            }
+            
+            return {
+                type: "FunctionExp",
+                params,
+                body,
+            } as FunctionExp
+            
+        }
+        if (this.get().type != TokenType.Identifier) { 
+            toss("Expected Identifier token after function keyword", 101) 
+        }
         const declaration = {
             type: "FunctionDeclaration",
             name: { type: "Identifier", name: this.eat().value },
@@ -502,7 +537,7 @@ export default class Parser {
             ? [] 
             : this.parse_argument_list()
 
-        this.expect(TokenType.CloseParen, "Expected closing parentheses arfter argument list")
+        this.expect(TokenType.CloseParen, "Expected closing parentheses after argument list")
         return args    
     }
     
@@ -571,6 +606,8 @@ export default class Parser {
                     "Invalid or unexpected token found, Expected \")\""
                 )
                 return value
+            case TokenType.Function: 
+                return this.parse_function_declaration()
             default:
                 process.exitCode = 101
                 throw new Error("Invalid or unexpected token found while parsing:\n" + JSON.stringify(this.get(), null, 2))

@@ -50,6 +50,8 @@ function represent(val: RuntimeValue): string {
             return "Native Function()"
         case "function":
             return "Function()"
+        case "function-exp":
+            return "Function Expression"
         case "return-value":
             return `Return Value: ${(val as ReturnValue).value}`
         case "array":
@@ -80,24 +82,30 @@ export const len: FunctionCall = (args) => {
     switch(args[0].type) {
         case "string":
             length = (args[0] as StringValue).value.length
+            break
         case "number":
             length = (args[0] as NumberValue).value.toString().length
+            break
         case "boolean":
             toss("Boolean values do not have a length")
         case "object":
             length = (args[0] as ObjectValue).properties.size
+            break
         case "null":
-            toss("null does not have a length")
+            toss("Null does not have a length")
         case "native-function":
-            toss("functions don't have a length")
+            toss("Functions don't have a length")
         case "function":
-            toss("functions don't have a length")
+            toss("Functions don't have a length")
         case "return-value":
             toss("Return values do not have a length")
         case "array":
             length = (args[0] as ArrayValue).elements.length
+            break
+        case "function-exp":
+            toss("Function expressions do not have a length")
     }
-    return Create.number(length)
+    return Create.number(length as number)
 } 
 
 export const _number: FunctionCall = (args) => {

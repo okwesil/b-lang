@@ -1,4 +1,4 @@
-import { Create, RuntimeValue, NullValue, FunctionValue, BooleanValue, ReturnValue } from "../values"
+import { Create, RuntimeValue, NullValue, FunctionValue, BooleanValue, ReturnValue, FunctionExpValue } from "../values"
 import {  VariableDeclaration, Program, FunctionDeclaration, ReturnStatement, WhileStatement, IfStatement  } from "../../frontend/ast"
 import { evaluate, toss } from "../interpreter"
 import Environment from "../environment"
@@ -25,8 +25,33 @@ export function evaluateReturnStatement(statement: ReturnStatement, env: Environ
     return evaluate(statement.value, env)
 }
 
-export function runFunction(fn: FunctionValue, parent: Environment, args: RuntimeValue[]): RuntimeValue {
-    let localScope = new Environment(parent)
+export function runFunction(fn: FunctionValue | FunctionExpValue, parent: Environment, args: RuntimeValue[]): RuntimeValue {
+    const localScope = new Environment(parent)
+
+    if (fn.type == "function-exp") {
+        for (let i = 0; i < fn.params.length; i++) {
+            localScope.declareVariable(fn.params[i].name, args[i], false)
+        }
+        let returnValue
+        if (fn.body.length == 1) {
+            return evaluate(fn.body[0], localScope)
+        }
+        for (const statement of fn.body) {
+            if (statement.type == "ReturnStatement") {
+                const val = evaluate(statement, localScope)
+                returnValue = val
+                break
+            }
+            let val = evaluate(statement, localScope)
+            if (val.type == "return-value") {
+                returnValue = (val as ReturnValue).value
+                break
+            }
+        }
+
+        return returnValue ? returnValue : Create.null()
+    }
+    
     for (let i = 0; i < fn.params.length; i++) {
         localScope.declareVariable(fn.params[i].name, args[i], false)
     }

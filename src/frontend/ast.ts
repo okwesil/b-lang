@@ -20,6 +20,7 @@ export type NodeType =
     | "SpreadExp"
     | "MemberExp"
     | "CallExp"
+    | "FunctionExp"
 
 
 export type Operator = "+" | "-" | "*" | "/" | "%" | "^" | ">" | "<" | "<=" | ">=" | "==" | "!=" | "and" | "or"
@@ -48,6 +49,13 @@ export interface FunctionDeclaration extends Statement {
     params: Identifier[]
     body: Statement[]
     returnType: Type
+}
+
+// anon functions (basically js arrow functions)
+export interface FunctionExp extends Statement {
+    type: "FunctionExp"
+    params: Identifier[]
+    body: Statement[] // could just be one statement
 }
 
 export interface ReturnStatement extends Statement {

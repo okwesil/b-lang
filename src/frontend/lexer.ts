@@ -22,7 +22,7 @@ export enum TokenType {
     // types
     ValueType,
     
-    Equals,
+    Equals, Arrow,
     And, Or, Spread,
     OpenParen, CloseParen,
     OpenCurlyBrace, CloseCurlyBrace,
@@ -192,6 +192,13 @@ export function tokenize(sourceCode: string): Token[] {
                     src.shift()
                     src.shift()
                     tokens.push(tokenFrom("==", TokenType.Equals, location.line, location.col))
+                    continue
+                }
+                if (src[1] == ">") {
+                    src.shift()
+                    src.shift()
+                    location.col++
+                    tokens.push(tokenFrom("=>", TokenType.Arrow, location.line, location.col))
                     continue
                 }
                 tokens.push(tokenFrom(src.shift(), TokenType.Equals, location.line, location.col))

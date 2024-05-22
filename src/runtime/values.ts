@@ -1,7 +1,7 @@
 import { Identifier, Statement, Type } from "../frontend/ast"
 import Environment from "./environment"
 
-export type ValueType = "null" | "number" | "string" | "boolean" | "object" | "native-function" | "function" | "return-value" | "array"
+export type ValueType = "null" | "number" | "string" | "boolean" | "object" | "native-function" | "function" | "function-exp" | "return-value" | "array"
 
 export interface RuntimeValue {
     type: ValueType
@@ -55,6 +55,12 @@ export interface FunctionValue extends RuntimeValue {
     returnType: Type
 }
 
+export interface FunctionExpValue extends RuntimeValue {
+    type: "function-exp"
+    params: Identifier[],
+    body: Statement[]
+}
+ 
 export interface ReturnValue extends RuntimeValue {
     type: "return-value"
     value?: RuntimeValue

@@ -1,6 +1,19 @@
 import { evaluate, toss } from "../interpreter"
-import { Create, RuntimeValue, NumberValue, ObjectValue, NativeFunctionValue, StringValue, FunctionValue, ArrayValue, BooleanValue } from "../values"
-import { ArrayLiteral, AssignmentExp, BinaryExp, CallExp, Identifier, MemberExp, ObjectLiteral, Operator, SpreadExp, UnaryExp, UnaryOperator } from "../../frontend/ast"
+import { Create, RuntimeValue, NumberValue, ObjectValue, NativeFunctionValue, StringValue, FunctionValue, ArrayValue, BooleanValue, FunctionExpValue } from "../values"
+import { 
+    ArrayLiteral, 
+    AssignmentExp, 
+    BinaryExp, 
+    CallExp, 
+    Identifier, 
+    MemberExp, 
+    ObjectLiteral, 
+    Operator, 
+    SpreadExp, 
+    UnaryExp, 
+    UnaryOperator, 
+    FunctionExp
+} from "../../frontend/ast"
 import Environment from "../environment"
 import { runFunction } from "./statements"
 
@@ -320,4 +333,12 @@ export function evaluateArrayExpression(array: ArrayLiteral | SpreadExp, env: En
     }
     let elements = array.elements.map(element => evaluate(element, env))
     return { type: "array", elements }
+}
+
+export function evaluateFunctionExpression(fn: FunctionExp, env: Environment): FunctionExpValue {
+    return {
+        type: "function-exp",
+        body: fn.body,
+        params: fn.params
+    }
 }
