@@ -16,7 +16,7 @@ export function createGlobalScope(): Environment {
     env.declareVariable("true", Create.bool(true), true)
     env.declareVariable("false", Create.bool(false), true)
 
-    // define a native function
+    // define natives
     env.declareVariable("Math", Create.object(math), true)
     env.declareVariable("len", Create.nativeFn(len), true)
     env.declareVariable("copy", Create.nativeFn(copy), true)
@@ -25,7 +25,7 @@ export function createGlobalScope(): Environment {
     env.declareVariable("print", Create.nativeFn(_print), true)
     env.declareVariable("String", Create.nativeFn(_string), true)
     env.declareVariable("Number", Create.nativeFn(_number), true)
-    env.declareVariable("date", Create.nativeFn((args, env) => Create.number(Date.now())), true)
+    env.declareVariable("date", Create.nativeFn(() => Create.number(Date.now())), true)
 
     return env
 }

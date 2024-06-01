@@ -52,8 +52,8 @@ const KEYWORDS: Record<string, TokenType> = {
     "string": TokenType.ValueType,
     "bool": TokenType.ValueType,
     "array": TokenType.ValueType,
+    "function": TokenType.ValueType
 }
-
 
 function isalpha(str: string): boolean {
     return str.toUpperCase() != str.toLowerCase()

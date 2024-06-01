@@ -26,7 +26,7 @@ export type NodeType =
 export type Operator = "+" | "-" | "*" | "/" | "%" | "^" | ">" | "<" | "<=" | ">=" | "==" | "!=" | "and" | "or"
 export type UnaryOperator = "-" | "not"
 export type AssignmentOperator = "=" | "+=" | "-=" | "*=" | "/=" | "%=" | "^="
-export type Type = "number" | "string" | "boolean" | "null" | "array" | "object"
+export type Type = "number" | "string" | "boolean" | "null" | "array" | "object" | "function"
 
 // statement doen't inherently return a value
 export interface Statement {

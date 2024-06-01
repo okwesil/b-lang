@@ -52,6 +52,7 @@ export function runFunction(fn: FunctionValue | FunctionExpValue, parent: Enviro
         return returnValue ? returnValue : Create.null()
     }
     
+    // if normal function
     for (let i = 0; i < fn.params.length; i++) {
         localScope.declareVariable(fn.params[i].name, args[i], false)
     }
@@ -59,7 +60,10 @@ export function runFunction(fn: FunctionValue | FunctionExpValue, parent: Enviro
     for (const statement of fn.body) {
         if (statement.type == "ReturnStatement") {
             const val = evaluate(statement, localScope)
-            if (val.type != fn.returnType) {
+            returnTypeCheck: if (val.type != fn.returnType) {
+                if (val.type == "function-exp" && fn.returnType == "function") {
+                    break returnTypeCheck
+                }
                 toss(`Invalid return type for ${fn.name}. Expected ${fn.returnType} but got ${val.type}`)
             }
             returnValue = val
