@@ -6,15 +6,21 @@ import readline from "readline/promises"
 import { Program } from "./frontend/ast"
 import { readFileSync } from "fs"
 import { createGlobalScope } from "./runtime/environment"
+import { program } from "commander"
 
 const env = createGlobalScope()
 
-const args = process.argv.slice(2)
-if (args[0] == "run") {
-    evaluate(run(args[1]), env)
-} else {
-    repl()
-}
+program
+    .argument("[file]", "file to execute")
+    .action(file => {
+        if (file) {
+            evaluate(run(file), env)
+        } else {
+            repl()
+        }
+    })
+program.parse()
+
 
 
 async function ask(prompt: string): Promise<string> {

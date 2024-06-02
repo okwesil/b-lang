@@ -20,7 +20,8 @@ import {
     UnaryExp,
     SpreadExp,
     Type,
-    FunctionExp, 
+    FunctionExp,
+    ForStatement, 
 } from "./ast"
 import { tokenize, Token, TokenType } from "./lexer"
 
@@ -45,10 +46,22 @@ export default class Parser {
                 return this.parse_while_statement()
             case TokenType.If:
                 return this.parse_if_statement()
+            case TokenType.For:
+                return this.parse_for_statement()
             default:
                 return this.parse_expression()
         }
 
+    }
+
+    private parse_block(): Statement[] {
+        let block = []
+        while (this.not_eof() && this.get().type != TokenType.CloseCurlyBrace) {
+            block.push(this.parse_statement())
+        } 
+        
+        this.eat() // eat curly brace
+        return block
     }
 
     /*
@@ -175,12 +188,7 @@ export default class Parser {
             condition,
             body: new Array<Statement>()
         } as WhileStatement
-        this.expect(TokenType.OpenCurlyBrace, "Expected open curly brace in expression")
-        while (this.not_eof() && this.get().type != TokenType.CloseCurlyBrace) {
-            statement.body.push(this.parse_statement())
-        } 
-        
-        this.eat() // eat curly brace
+        statement.body = this.parse_block()
 
         return statement
     }
@@ -199,6 +207,25 @@ export default class Parser {
         } 
         
         this.eat() // eat curly brace
+
+        return statement
+    }
+    
+    private parse_for_statement(): ForStatement {
+        this.eat()
+        const statement = {
+            type: "ForStatement",
+            left: { 
+                type: "Identifier", 
+                name: this.expect(TokenType.Identifier, "Expected variable name in for loop").value 
+            } as Identifier
+        } as ForStatement
+        this.expect(TokenType.Of, "Expected 'of' after variable name")
+        statement.right = this.parse_expression()
+
+        this.expect(TokenType.OpenCurlyBrace, "Expected open curly brace after for loop statement")
+        statement.body = this.parse_block()
+
 
         return statement
     }

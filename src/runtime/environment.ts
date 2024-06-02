@@ -6,7 +6,8 @@ import {
     math, 
     len, 
     inspect, 
-    copy
+    copy,
+    _range as range,
 } from "./native-functions"
 import { Create, RuntimeValue, Variable } from "./values"
 
@@ -25,6 +26,7 @@ export function createGlobalScope(): Environment {
     env.declareVariable("print", Create.nativeFn(_print), true)
     env.declareVariable("String", Create.nativeFn(_string), true)
     env.declareVariable("Number", Create.nativeFn(_number), true)
+    env.declareVariable("range", Create.nativeFn(range), true)
     env.declareVariable("date", Create.nativeFn(() => Create.number(Date.now())), true)
 
     return env

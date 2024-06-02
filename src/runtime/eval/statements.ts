@@ -1,7 +1,8 @@
-import { Create, RuntimeValue, NullValue, FunctionValue, BooleanValue, ReturnValue, FunctionExpValue } from "../values"
-import {  VariableDeclaration, Program, FunctionDeclaration, ReturnStatement, WhileStatement, IfStatement  } from "../../frontend/ast"
+import { Create, RuntimeValue, NullValue, FunctionValue, BooleanValue, ReturnValue, FunctionExpValue, ArrayValue } from "../values"
+import {  VariableDeclaration, Program, FunctionDeclaration, ReturnStatement, WhileStatement, IfStatement, ForStatement  } from "../../frontend/ast"
 import { evaluate, toss } from "../interpreter"
 import Environment from "../environment"
+import { evaluateArrayExpression } from "./expressions"
 
 export function evaluateVariableDeclaration(declaration: VariableDeclaration, env: Environment): NullValue {
     env.declareVariable(declaration.identifier, declaration.value ? evaluate(declaration.value, env): Create.null(), declaration.constant)
@@ -122,4 +123,22 @@ export function evaluateIfStatment(statement: IfStatement, env: Environment): Re
         }
     }
     return returnValue.value ? returnValue : Create.null()
+}
+
+export function evaluateForStatement(statement: ForStatement, env: Environment): NullValue {
+    let array = evaluate(statement.right, env)
+    if (array.type != "array") {
+        toss("Right side of for loop must evaluate to an array")
+        return Create.null()
+    }
+
+    for (const element of (array as ArrayValue).elements) {
+        const localScope = new Environment(env)
+        localScope.declareVariable(statement.left.name, element, true)
+        for (const stmt of statement.body) {
+            evaluate(stmt, localScope)
+        }
+    }
+
+    return Create.null()
 }

@@ -19,6 +19,7 @@ export enum TokenType {
     Return,
     While,
     If,
+    For, Of,
     // types
     ValueType,
     
@@ -44,6 +45,8 @@ const KEYWORDS: Record<string, TokenType> = {
     "return": TokenType.Return,
     "while": TokenType.While,
     "if": TokenType.If,
+    "for": TokenType.For,
+    "of": TokenType.Of,
     "or": TokenType.Or,
     "and": TokenType.And,
     "not": TokenType.UnaryOperator,

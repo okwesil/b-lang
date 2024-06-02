@@ -17,14 +17,15 @@ import {
     WhileStatement,
     IfStatement,
     ArrayLiteral,
-    FunctionExp
+    FunctionExp,
+    ForStatement
 } from "../frontend/ast";
 import Environment from "./environment";
 import { 
     evaluateVariableDeclaration, 
     evaluateProgram, evaluateFunctionDeclaration, 
     evaluateReturnStatement, evaluateWhileStatment,
-    evaluateIfStatment
+    evaluateIfStatment, evaluateForStatement
 } from "./eval/statements";
 import { 
     evaluateAssignment, 
@@ -78,6 +79,8 @@ export function evaluate(astNode: Statement, env: Environment): RuntimeValue {
             return evaluateWhileStatment(astNode as WhileStatement, env)
         case "IfStatement":
             return evaluateIfStatment(astNode as IfStatement, env)
+        case "ForStatement":
+            return evaluateForStatement(astNode as ForStatement, env)
         default:
             console.error("AST Node not setup: ")
             console.log(JSON.stringify(astNode, null, 2))

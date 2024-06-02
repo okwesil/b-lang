@@ -7,6 +7,7 @@ export type NodeType =
     | "ReturnStatement"
     | "WhileStatement"
     | "IfStatement"
+    | "ForStatement"
     // expressions
     | "NumberLiteral" 
     | "StringLiteral"
@@ -72,6 +73,13 @@ export interface WhileStatement extends Statement {
 export interface IfStatement extends Statement {
     type: "IfStatement"
     condition: Expression
+    body: Statement[]
+}
+
+export interface ForStatement extends Statement {
+    type: "ForStatement"
+    right: Expression
+    left: Identifier
     body: Statement[]
 }
  

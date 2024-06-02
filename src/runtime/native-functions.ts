@@ -184,3 +184,22 @@ export const math: Record<string, FunctionCall> = {
         return Create.number(Math.sqrt((args[0] as NumberValue).value))
     }
 }
+export const _range: FunctionCall = (args, env) => {
+    if (args.length < 1) {
+        toss("range: requires at least one argument")
+    }
+    return Create.array(range((args[0] as NumberValue)?.value, (args[1] as NumberValue)?.value))
+}
+
+function range(min: number, max: number) {
+    if (!max) {
+        max = min
+        min = 0
+    }
+
+    let nums = []
+    for (let i = min; i < max; i++) {
+        nums.push(i)
+    }
+    return nums
+}
